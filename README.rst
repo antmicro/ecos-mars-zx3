@@ -1,9 +1,11 @@
 Introduction
 ============
 
-This is a compilation and usage manual for the port of the eCos real-time operating system for Enclustra's Mars ZX3 Zynq module.
+This is a compilation and usage manual for the port of the eCos real-time operating system for `Enclustra's Mars ZX3 Zynq module <http://www.enclustra.com/en/products/system-on-chip-modules/mars-zx3/>`_.
 
 The port is undergoing verification by Enclustra, however it is made available for evaluation purposes.
+
+We would like to thank Enclustra GmbH (http://enclustra.com) for co-sponsoring the port as well as Richard Rauch (http://www.itrgmbh.de) for his help in the porting effort.
 
 ECos
 ----
@@ -35,8 +37,6 @@ Compiling the system
 ====================
 
 The port was prepared using Gentoo, Debian and Ubuntu Linux environments. The procedures described here should also work on other systems, but if you detect any errors or ommissions please e-mail us at contact@antmicro.com.
-
-.. _prerequisites:
 
 Prerequisites 
 -------------
@@ -140,8 +140,6 @@ Two ready-made ``.ecc`` files will be provided with this distribution.
 The first one, ``mars_zx3_ecos.ecc``, results in building the eCos kernel.
 The other, ``mars_zx3_redboot.ecc``, can be used to build RedBoot (see `RedBoot`_).
 
-.. _build-kernel:
-
 Building the kernel
 ~~~~~~~~~~~~~~~~~~~
 
@@ -163,8 +161,6 @@ A short shell script is proposed to make the compilation process easier:
       make
 
 The resulting kernel files can be found in ``build/install/lib``.
-
-.. _build-tests:
 
 Building tests
 ~~~~~~~~~~~~~~
