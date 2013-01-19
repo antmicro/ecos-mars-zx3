@@ -1,9 +1,11 @@
 Introduction
 ============
 
-This is a compilation and usage manual for the port of the eCos real-time operating system for Enclustra's Mars ZX3 Zynq module.
+This is a compilation and usage manual for the port of the eCos real-time operating system for `Enclustra's Mars ZX3 Zynq module <http://www.enclustra.com/en/products/system-on-chip-modules/mars-zx3/>`_.
 
 The port is undergoing verification by Enclustra, however it is made available for evaluation purposes.
+
+We would like to thank Enclustra GmbH (http://enclustra.com) for co-sponsoring the port as well as Richard Rauch (http://www.itrgmbh.de) for his help in the porting effort.
 
 ECos
 ----
@@ -36,8 +38,6 @@ Compiling the system
 
 The port was prepared using Gentoo, Debian and Ubuntu Linux environments. The procedures described here should also work on other systems, but if you detect any errors or ommissions please e-mail us at contact@antmicro.com.
 
-.. _prerequisites:
-
 Prerequisites 
 -------------
 
@@ -46,7 +46,7 @@ Toolchain
 
 The toolchain used to compile the port is Sourcery G++ Lite 2011.03-42, and can be obtained from `the Mentor Graphics website <https://sourcery.mentor.com/sgpp/lite/arm/portal/release1802>`_.
 
-It should be decompressed so that its :file:`bin` directory is included in the PATH variable.
+It should be decompressed so that its ``bin`` directory is included in the PATH variable.
 The proper availability of the toolchain can be checked by finding out if ``arm-none-eabi-gcc`` is available from the shell.
 
 ``ecosconfig``
@@ -68,9 +68,9 @@ For Gentoo platforms the package is named ``dev-lang/tcl``, you can install it u
 Source code and configuration files
 -----------------------------------
 
-The source of the port is provided with this manual, in a separate :file:`src.tar.bz2` file. 
+The source of the port is provided with this manual, in a separate ``src.tar.bz2`` file. 
 
-By default, two general purpose configuration files are provided with the relese. See :ref:`ready-made` for details.
+By default, two general purpose configuration files are provided with the relese. See `Ready-made .ecc files`_ for details.
 
 Eventually all the files mentioned above will be made available online.
 
@@ -80,12 +80,12 @@ Building eCos
 Using ``ecosconfig``
 ~~~~~~~~~~~~~~~~~~~~
 
-The main tool used for building the eCos operating system is ``ecosconfig`` (see :ref:`prerequisites`).
+The main tool used for building the eCos operating system is ``ecosconfig`` (see `Prerequisites`_).
 The source tree of eCos, called **eCos repository** (like for example the source code tree provided in this release) is not built directly but instead first trimmed down and configured to suit the needs of a specific user and platform using ``ecosconfig``.
 This static pick-and-build procedure allows the user to exclude these elements of the system which are not necessary, thus reducing the memory footprint.
 This mechanism also enables easy configuration of system-wide variables and driver specific features.
 
-What exactly can be included, excluded or configured is determined by the contents of :file:`.cdl` files residing side by side with all source files in the eCos repository (usually in the :file:`cdl` directory on the same level as the :file:`src` directory of a given package, like a driver for a particular interface).
+What exactly can be included, excluded or configured is determined by the contents of ``.cdl`` files residing side by side with all source files in the eCos repository (usually in the ``cdl`` directory on the same level as the ``src`` directory of a given package, like a driver for a particular interface).
 
 Package list
 ~~~~~~~~~~~~
@@ -104,17 +104,17 @@ The available packages which can be used in configuring eCos for Mars ZX3  are p
 ``.ecc`` files
 ~~~~~~~~~~~~~~
 
-The output of ``ecosconfig`` are :file:`.ecc` (**eC**\ os **C**\ onfiguration) files which are in essence ``tcl`` scripts storing all the information on what elements will be included in the system image and how they will be configured.
-A `handbook on ecosconfig <http://ecos.sourceware.org/docs-3.0/user-guide/using-ecosconfig-on-linux.html>`_ exists to help in the manual creation of :file:`ecc` files.
+The output of ``ecosconfig`` are ``.ecc`` (**eC**\ os **C**\ onfiguration) files which are in essence ``tcl`` scripts storing all the information on what elements will be included in the system image and how they will be configured.
+A `handbook on ecosconfig <http://ecos.sourceware.org/docs-3.0/user-guide/using-ecosconfig-on-linux.html>`_ exists to help in the manual creation of ``ecc`` files.
 
-While creating :file:`.ecc` files from scratch is possible, there exist several methods of making the process much simpler.
+While creating ``.ecc`` files from scratch is possible, there exist several methods of making the process much simpler.
 
 Templates and configtool
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-``configtool`` (see :ref:`prerequisites`) allows the user to build the system however they want using a graphical user interface, provided constraints in :file:`.cdl` files describing the system structure are maintained.
+``configtool`` (see `Prerequisites`_) allows the user to build the system however they want using a graphical user interface, provided constraints in ``.cdl`` files describing the system structure are maintained.
 
-While creating a new :file:`.ecc` file it is easier to also use a predefined template representing common use scenarios, such as **posix** which represents a system which has all the necessary packages to run typical POSIX programs or **redboot** which understandably is used to build a binary of RedBoot, the eCos bootloader.
+While creating a new ``.ecc`` file it is easier to also use a predefined template representing common use scenarios, such as **posix** which represents a system which has all the necessary packages to run typical POSIX programs or **redboot** which understandably is used to build a binary of RedBoot, the eCos bootloader.
 
 The supported templates are:
 
@@ -127,27 +127,23 @@ The supported templates are:
 * posix
 * redboot
 
-In order to select a template to base upon, use :menuselection:`build -> templates`. The necessary packages can be added from :menuselection:`build -> packages`.
+In order to select a template to base upon, use ``build --> templates``. The necessary packages can be added from ``build --> packages``.
 
 .. warning::
 
    Remember that the templates are just general scenarios, which may contain settings incompatible with the desired ones (baudrates, console mangling, debug console choice, presence of RedBoot ROM monitor). It is necessary to tweak them according to your needs. If you want to use a network connection through the ``Zynq Gigabit Ethernet Controller`` you have to enable at least one ``Ethernet tranceiver (PHY) support``.
 
-.. _ready-made:
-
-Ready-made ``.ecc`` files
+Ready-made .ecc files
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Two ready-made :file:`.ecc` files will be provided with this distribution.
-The first one, :file:`mars_zx3_ecos.ecc`, results in building the eCos kernel.
-The other, :file:`mars_zx3_redboot.ecc`, can be used to build RedBoot (see :ref:`redboot`).
-
-.. _build-kernel:
+Two ready-made ``.ecc`` files will be provided with this distribution.
+The first one, ``mars_zx3_ecos.ecc``, results in building the eCos kernel.
+The other, ``mars_zx3_redboot.ecc``, can be used to build RedBoot (see `RedBoot`_).
 
 Building the kernel
 ~~~~~~~~~~~~~~~~~~~
 
-Provided an :file:`.ecc` file is generated properly (or supplied from outside), eCos can now be compiled to include all the elements and options as selected in the file.
+Provided an ``.ecc`` file is generated properly (or supplied from outside), eCos can now be compiled to include all the elements and options as selected in the file.
 A short shell script is proposed to make the compilation process easier:
 
 .. topic:: Making the eCos kernel script.
@@ -164,31 +160,26 @@ A short shell script is proposed to make the compilation process easier:
       ../ecosconfig --config=../mars_zx3_ecos.ecc tree
       make
 
-The resulting kernel files can be found in :file:`build/install/lib`.
-
-.. _build-tests:
+The resulting kernel files can be found in ``build/install/lib``.
 
 Building tests
 ~~~~~~~~~~~~~~
 
 The system features a testing mechanism where particular drivers and system abstractions can be checked for proper functioning.
 
-The tests reside in the respective directories, for example :file:`devs/i2c/arm/xc7z/current/tests/i2ctest.c` (the test that can be used to check if I2C runs properly - see :ref:`i2ctest`).
-
+The tests reside in the respective directories, for example ``devs/i2c/arm/xc7z/current/tests/i2ctest.c`` (the test that can be used to check if I2C runs properly).
 Building all tests is very simple, it is enough to use ``make tests`` instead of ``make`` in a procedure like the one above. 
-The compiled test binaries reside in the respective directories, like :file:`build/install/tests/devs/i2c/arm/xc7z/current/tests/i2ctest`
+The compiled test binaries reside in the respective directories, like ``build/install/tests/devs/i2c/arm/xc7z/current/tests/i2ctest``
 
 .. warning::
 
-   Remember that tests are built only if the corresponding setting is enabled in the :file:`.ecc` used file. 
+   Remember that tests are built only if the corresponding setting is enabled in the ``.ecc`` used file. 
    Tests cannot be generated for the *redboot* template, as they are in essence eCos applications. 
 
-.. _build-application:
-   
 Building an eCos application
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-With a compiled kernel files in the :file:`build/install/lib` directory (see :ref:`build-kernel`), a user space eCos application can be compiled and linked to it.
+With a compiled kernel files in the ``build/install/lib`` directory (see `Building the kernel`_), a user space eCos application can be compiled and linked to it.
 
 .. topic:: Building user space application script.
 
@@ -212,8 +203,6 @@ With a compiled kernel files in the :file:`build/install/lib` directory (see :re
       arm-none-eabi-gcc -g -I./ -g -I${KPATH}/install/include ${FILES} \
       -L${KPATH}/install/lib -Ttarget.ld ${OPT}
 
-.. _redboot:
-   
 RedBoot
 =======
 
@@ -222,11 +211,11 @@ RedBoot is the eCos bootloader that shares the driver infrastructure with eCos. 
 Building RedBoot
 ----------------
 
-To build RedBoot, prepare an :file:`.ecc` based on the RedBoot template and build as normal (see :ref:`build-kernel`). A RedBoot binary (in the ELF format) will reside in :file:`build/install/bin/redboot.elf`. 
+To build RedBoot, prepare an ``.ecc`` based on the RedBoot template and build as normal (see `Building the kernel`_). A RedBoot binary (in the ELF format) will reside in ``build/install/bin/redboot.elf``. 
 
 .. warning::
 
-   If you built your system using the RedBoot template from scratch (not using an :file:`.ecc` file) and use the none-eabi compiler like the one suggested in this manual, you need to set the ``-fno-builtin`` compiler option.
+   If you built your system using the RedBoot template from scratch (not using an ``.ecc`` file) and use the none-eabi compiler like the one suggested in this manual, you need to set the ``-fno-builtin`` compiler option.
    Otherwise a runtime error occurs.
 
 Ethernet support in RedBoot
@@ -244,11 +233,11 @@ By default, the board will use DHCP to acquire the IP address, this is however f
 IP setting in ``.ecc``
 ~~~~~~~~~~~~~~~~~~~~~~
 
-The IP address of the board can be set using the value :menuselection:`Redboot ROM monitor --> Build redboot ROM ELF image --> Redboot Networking --> Default IP address` in ``configtool``.
+The IP address of the board can be set using the value ``Redboot ROM monitor --> Build redboot ROM ELF image --> Redboot Networking --> Default IP address`` in ``configtool``.
 
-If DHCP is to be used, select :menuselection:`Use DHCP to get IP information`; otherwise uncheck it.
+If DHCP is to be used, select ``Use DHCP to get IP information``; otherwise uncheck it.
 
-Also :menuselection:`Use a gateway fot non-local IP traffic --> Default gateway IP address` and :menuselection:`Use a gateway fot non-local IP traffic --> Default IP address mask` may be of interest.
+Also ``Use a gateway fot non-local IP traffic --> Default gateway IP address` and ``Use a gateway fot non-local IP traffic --> Default IP address mask`` may be of interest.
 
 IP setting at runtime
 ~~~~~~~~~~~~~~~~~~~~~
@@ -268,15 +257,13 @@ More will be written on use of Flash in RedBoot on Enclustra Mars ZX3 soon.
 Usage
 =====
 
-After building a eCos kernel (see :ref:`build-kernel`), a user application must be linked against it to produce a runnable program (see :ref:`build-application`). The program can be directly uploaded to the module (see :ref:`loading`) or included in a boot image file (see :ref:`build-boot`).
-
-.. _build-boot:
+After building a eCos kernel (see `Building the kernel`_), a user application must be linked against it to produce a runnable program (see `Building an eCos application`_). The program can be directly uploaded to the module (see `Loading binaries to the module`_) or included in a boot image file (see `Building a boot image file`_).
 
 Building a boot image file
 --------------------------
 
 The boot image is the file which is used to program the Flash memory on the Mars ZX3 module. The boot image contains the FSBL (First Stage Bootloader), the SLCR configuration data for the Zynq EPP, the bitstream for the PL and the user application or the Second Stage Bootloader. Only the FSBL is required to create the boot image. Other components are optional.
-The boot image file is built with the ``bootgen`` tool from the Xilinx Design Suite. To create the image, a simple text file in the :file:`.bif` format, containing a list of files used in the process, is needed. An example :file:`.bif` file is presented below:
+The boot image file is built with the ``bootgen`` tool from the Xilinx Design Suite. To create the image, a simple text file in the ``.bif`` format, containing a list of files used in the process, is needed. An example ``.bif`` file is presented below:
 
 .. code-block:: c
 
@@ -287,7 +274,7 @@ The boot image file is built with the ``bootgen`` tool from the Xilinx Design Su
        redboot.elf
    }
 
-The filenames used in the :file:`.bif` file may also contain an absolute path if they are located in another directory than the :file:`.bif` file. Next, ``bootgen`` should be used to build the boot image:
+The filenames used in the ``.bif`` file may also contain an absolute path if they are located in another directory than the ``.bif`` file. Next, ``bootgen`` should be used to build the boot image:
 
 .. code-block:: bash
     
@@ -295,8 +282,6 @@ The filenames used in the :file:`.bif` file may also contain an absolute path if
         
 After the boot image is created, it may be uploaded to the Mars ZX3 module using the ``Enclustra MCT`` software, which can be obtained from Enclustra GmbH.
 Further details about the process of creating a boot image can be found in the `Zynq-7000 EPP Software Developers Guide <http://www.xilinx.com/support/documentation/user_guides/ug821-zynq-7000-swdg.pdf>`_ on page 29.
-
-.. _loading:
 
 Loading binaries to the module
 ------------------------------
@@ -317,7 +302,7 @@ Appendix 1: Clock speeds
 
 The default CPU clock frequency on the MARS ZX3 board is 400MHz. The RTC system timer is clocked by CPU frequency divided by 4. The required timer interrupt period is 1ms.
 System initialization parameters are set as described above in:
-:file:`packages/hal/xc7z/var/current/cdl/hal_arm_xc7z.cdl`:
+``packages/hal/xc7z/var/current/cdl/hal_arm_xc7z.cdl``:
 
 .. topic:: Clock settings
 
