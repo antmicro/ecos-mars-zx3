@@ -204,4 +204,12 @@ cdl_package CYGPKG_DEVS_ETH_PHY {
           Include support for Vitesse VSC8244"
     }
 
+    cdl_option CYGHWR_DEVS_ETH_PHY_MV88E1518 {
+        display       "Marvell 88E1518"
+        flavor        bool
+        default_value 0
+        compile       -library=libextras.a MV88E1518.c
+        description "
+          Include support for PHY Marvell 88E1518"
+    }
 }
