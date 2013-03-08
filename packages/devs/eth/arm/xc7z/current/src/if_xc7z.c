@@ -177,6 +177,8 @@ volatile zynq_eth_bd *last_tx_bd = NULL;
 #if CYGHWR_DEVS_ETH_PHY_KSZ90x1
 extern int ksz90x1_phy_cfg(eth_phy_access_t *f, int mode);            
 #define eth_phy_cfg(f, mode) ksz90x1_phy_cfg(f,mode)                 
+#else  //!CYGHWR_DEVS_ETH_PHY_KSZ90x1
+#define eth_phy_cfg(f, mode) _eth_phy_state(f)
 #endif //CYGHWR_DEVS_ETH_PHY_KSZ90x1
 #endif //CYGPKG_DEVS_ETH_PHY
 //#endif //CYGPKG_DEVS_ETH_ARM_XC7Z_ETH0 || CYGPKG_DEVS_ETH_ARM_XC7Z_ETH1
