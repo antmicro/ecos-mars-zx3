@@ -214,7 +214,7 @@ man_pages = [
      [authors], 1)
 ]
 
-latex_additional_files = ['antmicro.sty']
+latex_additional_files = ['antmicro.sty','images/logo-400.png']
 
 latex_elements = {
     'fontpkg': '\\usepackage{palatino}',
