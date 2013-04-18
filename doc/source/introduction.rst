@@ -353,7 +353,7 @@ I2C Test
 --------
 
 The test mimicks the functioning of the Xilinx BSP-based test provided for the ZX3 module by Enclustra, i.e. communicates with the on-board EEPROM to read module data and then tests the RTC, both of which reside on the module and are connected to the I2C bus.
-The test is part of the standard eCos test suite and will be built using the procedure described in :ref:`build_tests` for any :file:`.ecc` which includes the I2C package (``CYGPKG_IO_I2C``).
+The test is part of the standard eCos test suite and will be built using the procedure described in :ref:`build-tests` for any :file:`.ecc` which includes the I2C package (``CYGPKG_IO_I2C``).
 
 Appendix 1: Clock speeds
 ========================
