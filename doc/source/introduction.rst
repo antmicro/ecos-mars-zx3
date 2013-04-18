@@ -46,6 +46,7 @@ Version information
    Michael Gielda,Corrections,25.10.2012,0.6.2
    Karol Gugala,Minor Updates,10.01.2013,0.6.3
    Michael Gielda,Updates to feature test feedback,11.01.2013,0.7
+   Michael Gielda,Fixes for readthedocs,18.04.2013,0.7.1
 
 Compiling the system
 ====================
@@ -153,7 +154,7 @@ In order to select a template to base upon, use :menuselection:`build -> templat
 
 .. warning::
 
-   Remember that the templates are just general scenarios, which may contain settings incompatible with the desired ones (baudrates, console mangling, debug console choice, presence of RedBoot ROM monitor). It is necessary to tweak them according to your needs. If you want to use a network connection through the ``Zynq Gigabit Ethernet Controller`` you have to enable at least one ``Ethernet tranceiver (PHY) support`` as presented in figure :num:`fig. #configtool-phy`
+   Remember that the templates are just general scenarios, which may contain settings incompatible with the desired ones (baudrates, console mangling, debug console choice, presence of RedBoot ROM monitor). It is necessary to tweak them according to your needs. If you want to use a network connection through the ``Zynq Gigabit Ethernet Controller`` you have to enable at least one ``Ethernet tranceiver (PHY) support`` as presented in the figure entitled :ref:`configtool-phy`
 
 .. _ready-made:
 
