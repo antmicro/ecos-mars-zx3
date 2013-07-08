@@ -1,9 +1,7 @@
 Introduction
 ============
 
-This is a compilation and usage manual for the port of the eCos real-time operating system for Enclustra's Mars ZX3 Zynq module.
-
-We would like to thank Enclustra GmbH (http://enclustra.com) for co-sponsoring the port as well as Richard Rauch (http://www.itrgmbh.de) for his help in the porting effort.
+This is a port of the eCos 3.0 real-time operating system for `Enclustra's Mars ZX3 Zynq module <http://www.enclustra.com/en/products/system-on-chip-modules/mars-zx3/>`_.
 
 ECos
 ----
@@ -14,6 +12,11 @@ This document
 -------------
 
 For the most part, this document describes features specific to the Mars ZX3 port, however it also contains some information which do not directly refer to the port but may be helpful in working with the system. 
+
+Acknowledgements
+----------------
+
+We would like to thank Enclustra GmbH (http://enclustra.com) for co-sponsoring the port as well as Richard Rauch (http://www.itrgmbh.de) for his help in the porting effort.
 
 The remarks of Garry Jeromson and Christoph Glattfelder of Enclustra GmbH, the manufacturer of the module, have been extremely helpful in making this document more complete and accurate.
 
