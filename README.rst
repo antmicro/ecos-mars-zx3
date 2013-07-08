@@ -3,8 +3,6 @@ Introduction
 
 This is a port of the eCos 3.0 real-time operating system for `Enclustra's Mars ZX3 Zynq module <http://www.enclustra.com/en/products/system-on-chip-modules/mars-zx3/>`_.
 
-The port is undergoing verification by Enclustra, however it is made available for evaluation purposes.
-
 The full documentation for the port can be acquired from the following links:
 
 * https://ecos-for-enclustra-mars-zx3-zynq-module.readthedocs.org/en/latest/ (HTML)
