@@ -88,11 +88,9 @@ For Gentoo platforms the package is named ``dev-lang/tcl``, you can install it u
 Source code and configuration files
 -----------------------------------
 
-The source of the port is provided with this manual, in a separate :file:`src.tar.bz2` file. 
+The source of the port is provided with this manual. 
 
 By default, two general purpose configuration files are provided with the relese. See :ref:`ready-made` for details.
-
-Eventually all the files mentioned above will be made available online.
 
 Building eCos
 -------------
