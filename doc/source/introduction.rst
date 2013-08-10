@@ -225,7 +225,7 @@ With a compiled kernel files in the :file:`build/install/lib` directory (see :re
       TPATH="/path/to/toolchain/bin/directory"  # modify this
 
       # Set compiler path.
-      export PATH=#{TPATH}:${PATH}
+      export PATH=${TPATH}:${PATH}
 
       # Application source code.
       FILES="file1.c file2.c file3.c"
