@@ -20,6 +20,19 @@ We would like to thank Enclustra GmbH (http://enclustra.com) for co-sponsoring t
 
 The remarks of Garry Jeromson and Christoph Glattfelder of Enclustra GmbH, the manufacturer of the module, have been extremely helpful in making this document more complete and accurate.
 
+Licence
+-------
+
+*(based on the* `eCos licence overview <http://ecos.sourceware.org/license-overview.html>`_\ *)*
+
+ECos is released under a modified version of the well known `GNU General Public License (GPL) <http://www.gnu.org/copyleft/gpl.html>`_. The eCos license is officially recognised as a GPL-compatible Free Software License. An **exception clause** has been added which limits the circumstances in which the license applies to other code when used in conjunction with eCos. The exception clause is as follows:
+
+   As a special exception, if other files instantiate templates or use macros or inline functions from this file, or you compile this file and link it with other works to produce a work based on this file, this file does not by itself cause the resulting work to be covered by the GNU General Public License. However the source code for this file must still be made available in accordance with section (3) of the GNU General Public License.
+
+   This exception does not invalidate any other reasons why a work based on this file might be covered by the GNU General Public License.
+
+**The license does not require users to release the source code of any** *applications* **that are developed with eCos.**
+
 Supported features
 ------------------
 
@@ -50,6 +63,7 @@ Version information
    Karol Gugala,Minor Updates,10.01.2013,0.6.3
    Michael Gielda,Updates to feature test feedback,11.01.2013,0.7
    Michael Gielda,Fixes for readthedocs,18.04.2013,0.7.1
+   Michael Gielda,Feedback from the community,10.08.2013,0.7.2
 
 Compiling the system
 ====================
