@@ -56,7 +56,8 @@ Version information
    Michael Gielda,Draft version,10.09.2012,0.1
    Michael Gielda,Preliminary release,15.09.2012,0.2
    Ziemowit Borowski,First release,25.09.2012,0.3
-   Michael Gielda,Corrections; ecc files; appendix,28.09.2012,0.5
+   Michael Gielda,Review,26.09.2012,0.4
+   Michael Gielda,Corrections; ecc files; Appendix 1,28.09.2012,0.5
    Michael Gielda,Updates for secondary release,10.10.2012,0.6
    Mateusz Majchrzycki,Added section on building a boot image,25.10.2012,0.6.1
    Michael Gielda,Corrections,25.10.2012,0.6.2
@@ -64,6 +65,7 @@ Version information
    Michael Gielda,Updates to feature test feedback,11.01.2013,0.7
    Michael Gielda,Fixes for readthedocs,18.04.2013,0.7.1
    Michael Gielda,Feedback from the community,10.08.2013,0.7.2
+   Michael Gielda,Appendix 2: MMU mappings for custom IP cores,15.08.2013,0.7.3
 
 Compiling the system
 ====================
@@ -102,7 +104,7 @@ For Gentoo platforms the package is named ``dev-lang/tcl``, you can install it u
 Source code and configuration files
 -----------------------------------
 
-The source of the port is provided with this manual. 
+The source of the port is provided `on github <https://github.com/antmicro/ecos-mars-zx3>`_. 
 
 By default, two general purpose configuration files are provided with the relese. See :ref:`ready-made` for details.
 
@@ -177,8 +179,8 @@ Ready-made ``.ecc`` files
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Two ready-made :file:`.ecc` files will be provided with this distribution.
-The first one, :file:`mars_zx3_ecos.ecc`, results in building the eCos kernel.
-The other, :file:`mars_zx3_redboot.ecc`, can be used to build RedBoot (see :ref:`redboot`).
+The first one, `mars_zx3_ecos.ecc <https://github.com/antmicro/ecos-mars-zx3/blob/master/mars_zx3_ecos.ecc>`_, can be used to build the eCos kernel, to be linked against by a user application
+The other, `mars_zx3_redboot.ecc <https://github.com/antmicro/ecos-mars-zx3/blob/master/mars_zx3_redboot.ecc>`_, can be used to build RedBoot (see :ref:`redboot`).
 
 .. _build-kernel:
 
@@ -428,3 +430,20 @@ CYGNUM_HAL_RTC_NUMERATOR/CYGNUM_HAL_RTC_DENOMINATOR nanoseconds.
 CYGNUM_HAL_RTC_PERIOD is a value written directly to the clock divider to obtain the required interrupt frequency.
 It is calculated just like the CPU clock using the CYGHWR_HAL_ARM_SOC_PROCESSOR_CLOCK, CYGNUM_HAL_RTC_CPU_CLOCK_DIVIDER
 and CYGNUM_HAL_RTC_DENOMINATOR values.
+
+Appendix 2: MMU mappings for custom IP cores
+============================================
+
+This port is aimed at a highly configurable Zynq platform, where the user is free to create custom connections through the FPGA fabric to peripherals which can then be accessed via memory using mappings. 
+
+The port features only a basic set of mappings to support the fixed onboard peripherals while any custom mappings have to be done manually to reflect the bistream configuration of the FPGA.
+
+The ``hal_mmu_init`` function in `mars_zx3_misc.c <https://github.com/antmicro/ecos-mars-zx3/blob/master/packages/hal/arm/xc7z/mars_zx3/current/src/mars_zx3_misc.c>`_ is the best place to add such mappings on top of the ones for RAM, IO, SLCR and on-chip RAM.
+
+To map additional memory regions (e.g. for custom ipcores), the ``ARC_X_ARM_MMU_SECTION`` macro can be used.
+An example for a 0x70A00000 .. 0x70AFFFFF mapping is given below:
+
+.. code-block:: c
+
+   ARC_X_ARM_MMU_SECTION(0x70a, 0x70a, 1, ARC_ARM_UNCACHEABLE,
+                         ARC_ARM_UNBUFFERABLE, ARC_ARM_ACCESS_PERM_RW_RW);
