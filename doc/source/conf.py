@@ -223,3 +223,5 @@ latex_elements = {
     'classoptions':',openany,oneside',
     'babel': '\\usepackage[english]{babel}' 
 }
+
+rst_epilog = "\n.. |project| replace:: "+project+" \n"
