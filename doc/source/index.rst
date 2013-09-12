@@ -1,5 +1,5 @@
-Mars ZX3 eCos manual
-====================
+|project|
+=========
 
 .. toctree::
    :maxdepth: 2
