@@ -59,7 +59,7 @@
 #include <cyg/hal/var_mmu.h>
 
 
-#ifdef CYGPKG_DEVS_QSPI_ARM_XC7Z
+#ifdef CYGHWR_DEVS_QSPI_ARM_XC7Z
 #ifdef CYGPKG_DEVS_FLASH_SPI_M25PXX
 #include <cyg/io/m25pxx.h>
 #include <cyg/io/qspi_xc7z.h>
