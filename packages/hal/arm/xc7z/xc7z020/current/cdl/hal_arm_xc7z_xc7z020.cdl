@@ -166,7 +166,7 @@ cdl_package CYGPKG_HAL_ARM_XC7Z020 {
             flavor  data
             no_define
             default_value { CYGBLD_GLOBAL_WARNFLAGS . CYGBLD_ARCH_CFLAGS .
-                            "-mcpu=cortex-a9 -mfpu=neon -g -O2 -ffunction-sections -fdata-sections -fno-rtti -fno-exceptions -fvtable-gc -finit-priority" }
+                            "-mcpu=cortex-a9 -mfpu=neon -g -O2 -ffunction-sections -fdata-sections -fno-rtti -fno-exceptions -fvtable-gc -finit-priority -fno-builtin-memcpy" }
             description   "
                 This option controls the global compiler flags which are used to
                 compile all packages by default. Individual packages may define
