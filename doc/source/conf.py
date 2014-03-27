@@ -39,7 +39,7 @@ master_doc = 'index'
 # General information about the project.
 project = u'Mars ZX3 eCos manual'
 basic_filename = u'Mars-ZX3--eCos--manual'
-authors = u'Ant Micro'
+authors = u'Antmicro Ltd'
 copyright = u'2012 - ' + authors
 
 # The version info for the project you're documenting, acts as replacement for
