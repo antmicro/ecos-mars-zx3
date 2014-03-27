@@ -106,7 +106,7 @@ Source code and configuration files
 
 The source of the port is provided `on github <https://github.com/antmicro/ecos-mars-zx3>`_. 
 
-By default, two general purpose configuration files are provided with the relese. See :ref:`ready-made` for details.
+By default, two general purpose configuration files are provided with the release. See :ref:`ready-made` for details.
 
 Building eCos
 -------------
