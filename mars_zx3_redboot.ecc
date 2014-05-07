@@ -5257,23 +5257,6 @@ cdl_option CYGHWR_HAL_ARM_DUMP_EXCEPTIONS {
     #   --> 0
 };
 
-# Call the exception handler after jumps to zero
-# Calls the exception handler with a 'software interrupt' after
-# a jump to zero is detected. Enable this only, when the
-# platform does not support the warm reset feature
-#
-cdl_option CYGARC_HAL_DETECT_JUMP_TO_ZERO {
-    # Flavor: bool
-    # No user value, uncomment the following line to provide one.
-    # user_value 0
-    # value_source default
-    # Default value: 0
-    # Requires: !CYG_HAL_STARTUP_ROM && !CYG_HAL_STARTUP_ROMRAM
-    #     CYG_HAL_STARTUP_ROM (unknown) == 0
-    #     CYG_HAL_STARTUP_ROMRAM (unknown) == 0
-    #   --> 1
-};
-
 # Process all exceptions with the eCos application
 # Normal RAM-based programs which do not include GDB stubs 
 # defer processing of the illegal instruction exception to GDB.
@@ -9296,51 +9279,6 @@ cdl_option CYGSEM_IO_ETH_DRIVERS_WARN {
     # Default value: 0
 };
 
-# <
-# Support for ProfiNET network stack.
-#
-cdl_component CYGPKG_IO_ETH_DRIVERS_PROFINET {
-    # This option is not active
-    # ActiveIf constraint:  !CYGPKG_NET && !CYGPKG_NET_LWIP && !CYGPKG_IO_ETH_DRIVERS_STAND_ALONE
-    #     CYGPKG_NET (unknown) == 0
-    #     CYGPKG_NET_LWIP (unknown) == 0
-    #     CYGPKG_IO_ETH_DRIVERS_STAND_ALONE == 1
-    #   --> 0
-
-    # Flavor: bool
-    # No user value, uncomment the following line to provide one.
-    # user_value 0
-    # value_source default
-    # Default value: 0
-    # Requires: CYGINT_ISO_STRING_MEMFUNCS
-    #     CYGINT_ISO_STRING_MEMFUNCS == 1
-    #   --> 1
-
-    # The following properties are affected by this value
-    # component CYGPKG_IO_ETH_DRIVERS_STAND_ALONE
-    #     ActiveIf:  !CYGPKG_NET && !CYGPKG_NET_LWIP && !CYGPKG_IO_ETH_DRIVERS_PROFINET
-};
-
-# >
-# Number of [network] buffers
-# This option is used to allocate space to buffer incoming network
-# packets.  These buffers are used to hold data until they can be
-# logically processed by higher layers.
-#
-cdl_option CYGNUM_IO_ETH_DRIVERS_NUM_PKT_PN {
-    # This option is not active
-    # The parent CYGPKG_IO_ETH_DRIVERS_PROFINET is not active
-    # The parent CYGPKG_IO_ETH_DRIVERS_PROFINET is disabled
-
-    # Flavor: data
-    # No user value, uncomment the following line to provide one.
-    # user_value 4
-    # value_source default
-    # Default value: 4
-    # Legal values: 2 to 32
-};
-
-# <
 # Support for lwIP network stack.
 #
 cdl_component CYGPKG_IO_ETH_DRIVERS_LWIP {
