@@ -949,11 +949,10 @@ flash_set_config(char *key, void *val, int type)
 {
     char *dp;
     void *val_ptr;
-	
+
     if (!config_ok) return false;
-	
+
     if ((dp = flash_lookup_config(key)) != NULL) {
-	
         if (CONFIG_OBJECT_TYPE(dp) == type) {
             val_ptr = (void *)CONFIG_OBJECT_VALUE(dp);
             switch (type) {

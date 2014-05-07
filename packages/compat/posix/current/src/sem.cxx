@@ -161,42 +161,6 @@ externC int sem_wait  (sem_t *sem)
 }
 
 // -------------------------------------------------------------------------
-// Decrement value if >0 or wait for a post.
-
-externC int sem_timedwait(sem_t *sem, struct timespec *abs_timeout)
-{
-    int retval = 0;
-
-    SEMA_ENTRY();
-
-#ifdef CYGPKG_POSIX_PTHREAD
-    // check for cancellation first.
-    pthread_testcancel();
-#endif
-
-    Cyg_Counting_Semaphore *sema = (Cyg_Counting_Semaphore *)sem;
-
-    if (!valid_timespec(abs_timeout)) {
-        retval = EINVAL;
-    }
-    else if( ! sema->wait(cyg_timespec_to_ticks(abs_timeout)) ) {
-        if((Cyg_Thread::self())->get_wake_reason() == Cyg_Thread::TIMEOUT) {
-            retval = ETIMEDOUT;
-        }
-        else {
-            retval = EINTR;
-        }
-    }
-
-#ifdef CYGPKG_POSIX_PTHREAD
-    // check if we were woken because we were being cancelled
-    pthread_testcancel();
-#endif
-
-    SEMA_RETURN(retval);
-}
-
-// -------------------------------------------------------------------------
 // Decrement value if >0, return -1 if not.
 
 externC int sem_trywait  (sem_t *sem)

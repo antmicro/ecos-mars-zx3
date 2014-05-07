@@ -186,8 +186,7 @@ do_version(int argc, char *argv[])
 #ifdef HAL_PLATFORM_CPU
     diag_printf("Platform: %s (%s) %s\n", HAL_PLATFORM_BOARD, HAL_PLATFORM_CPU, HAL_PLATFORM_EXTRA);
 #endif
-// Exegin change - Print correct span of default RAM section
-    diag_printf("RAM: %p-%p ", (void*)ram_start, (unsigned char *)ram_end - 1);
+    diag_printf("RAM: %p-%p ", (void*)ram_start, (void*)ram_end);
     diag_printf("[%p-%p available]\n", mem_segments[0].start, mem_segments[0].end);
 #if CYGBLD_REDBOOT_MAX_MEM_SEGMENTS > 1
     for (seg = 1;  seg < CYGBLD_REDBOOT_MAX_MEM_SEGMENTS;  seg++) {

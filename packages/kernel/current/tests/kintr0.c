@@ -90,16 +90,12 @@ static cyg_uint32 isr0(cyg_vector_t vector, cyg_addrword_t data)
 {
     CYG_UNUSED_PARAM(cyg_addrword_t, data);
 
-    diag_printf("\n###### isr0 ----- CALL vector=%d ", vector);
-
     cyg_interrupt_acknowledge(vector);
     return 0;
 }
 
 static void dsr0(cyg_vector_t vector, cyg_ucount32 count, cyg_addrword_t data)
 {
-	diag_printf("\n###### dsr0 ----- CALL vector=%d ", vector);
-
     CYG_UNUSED_PARAM(cyg_vector_t, vector);
     CYG_UNUSED_PARAM(cyg_ucount32, count);
     CYG_UNUSED_PARAM(cyg_addrword_t, data);
@@ -146,15 +142,17 @@ static bool flash( void )
 
 static cyg_VSR_t vsr0;
 
-static void vsr0()
+static void vsr0(void)
 {
 }
+
+static void (*vsr0_p)(void) = vsr0;
 
 void kintr0_main( void )
 {
     cyg_vector_t v = (CYGNUM_HAL_VSR_MIN + 11) % CYGNUM_HAL_VSR_COUNT;
     cyg_vector_t v1;
-    cyg_vector_t lvl1 = CYGNUM_HAL_ISR_MIN + (33 % CYGNUM_HAL_ISR_COUNT);
+    cyg_vector_t lvl1 = CYGNUM_HAL_ISR_MIN + (1 % CYGNUM_HAL_ISR_COUNT);
     cyg_vector_t lvl2 = CYGNUM_HAL_ISR_MIN + (15 % CYGNUM_HAL_ISR_COUNT);
     int in_use;
 
@@ -225,7 +223,7 @@ void kintr0_main( void )
     cyg_interrupt_get_vsr( v, &new_vsr );
     CHECK( old_vsr == new_vsr );
         
-    CHECK( NULL != vsr0 );
+    CHECK( NULL != *vsr0_p );
 
     cyg_interrupt_mask(v1);
     cyg_interrupt_unmask(v1);

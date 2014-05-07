@@ -67,16 +67,6 @@
 #include <cyg/hal/hal_arch.h>           // HAL header
 #include <cyg/hal/hal_intr.h>           // HAL header
 
-//cachelock{                                    // Added 06.01.2012
-#ifdef CYGPKG_HAL_ARM_ARM9_AT91RM9200 // in case of cachelock
-# define __CACHELOCK__ __attribute__(( section( ".cachelock" ) ))
-#else // no cachelock
-# define __CACHELOCK__ 
-#endif
-//cachelock}
-
-
-//externC void diag_printf(const char *fmt, ...); // Added 06.01.2012
 /*------------------------------------------------------------------------*/
 /* First level C exception handler.                                       */
 
@@ -261,62 +251,14 @@ __break_opcode (void)
 }
 #endif
 
-#ifdef CYGPKG_HAL_ARM_ARM9_AT91RM9200
-// Added 06.01.2012
-static const unsigned char BitLookupTbl[ 256 ] = { 
- 0xff,  0,  1,  0,  2,  0,  1,  0,  3,  0,  1,  0,  2,  0,  1,  0,
-    4,  0,  1,  0,  2,  0,  1,  0,  3,  0,  1,  0,  2,  0,  1,  0,
-    5,  0,  1,  0,  2,  0,  1,  0,  3,  0,  1,  0,  2,  0,  1,  0,
-    4,  0,  1,  0,  2,  0,  1,  0,  3,  0,  1,  0,  2,  0,  1,  0,
-    6,  0,  1,  0,  2,  0,  1,  0,  3,  0,  1,  0,  2,  0,  1,  0,
-    4,  0,  1,  0,  2,  0,  1,  0,  3,  0,  1,  0,  2,  0,  1,  0,
-    5,  0,  1,  0,  2,  0,  1,  0,  3,  0,  1,  0,  2,  0,  1,  0,
-    4,  0,  1,  0,  2,  0,  1,  0,  3,  0,  1,  0,  2,  0,  1,  0,
-    7,  0,  1,  0,  2,  0,  1,  0,  3,  0,  1,  0,  2,  0,  1,  0,
-    4,  0,  1,  0,  2,  0,  1,  0,  3,  0,  1,  0,  2,  0,  1,  0,
-    5,  0,  1,  0,  2,  0,  1,  0,  3,  0,  1,  0,  2,  0,  1,  0,
-    4,  0,  1,  0,  2,  0,  1,  0,  3,  0,  1,  0,  2,  0,  1,  0,
-    6,  0,  1,  0,  2,  0,  1,  0,  3,  0,  1,  0,  2,  0,  1,  0,
-    4,  0,  1,  0,  2,  0,  1,  0,  3,  0,  1,  0,  2,  0,  1,  0,
-    5,  0,  1,  0,  2,  0,  1,  0,  3,  0,  1,  0,  2,  0,  1,  0,
-    4,  0,  1,  0,  2,  0,  1,  0,  3,  0,  1,  0,  2,  0,  1,  0,
-};
-#endif
-
-int hal_lsbindex( int mask ) __CACHELOCK__;
-
-int hal_lsbindex( int mask )
+int
+hal_lsbindex(int mask)
 {
-#ifdef CYGPKG_HAL_ARM_ARM9_AT91RM9200
-  // Added 06.01.2012
- 
-
-  unsigned x;
-  unsigned ret = 0;
-
-  if( !( x = ( ( ( (unsigned)mask ) >> 0 ) & 0xff ) ) ) {
-    if( !( x = ( ( ( (unsigned)mask ) >> 8 ) & 0xff ) ) ) {
-      if( !( x = ( ( ( (unsigned)mask ) >> 16 ) & 0xff ) ) ) {
-        if( !( x = ( ( ( (unsigned)mask ) >> 24 ) & 0xff ) ) )
-          return -1;
-        else
-          ret = 24;
-      }
-      else
-        ret = 16;
-    }
-    else
-      ret = 8;
-  }
-  return (int)( ret + BitLookupTbl[ x ] );
-#else
-//original from eCos:
     int i;
     for (i = 0;  i < 32;  i++) {
       if (mask & (1<<i)) return (i);
     }
     return (-1);
-#endif
 }
 
 int

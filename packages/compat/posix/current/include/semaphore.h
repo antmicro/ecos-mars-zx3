@@ -94,9 +94,6 @@ externC int sem_destroy  (sem_t *sem);
 // Decrement value if >0 or wait for a post.
 externC int sem_wait  (sem_t *sem);
 
-// Decrement value if >0 or wait for a post.
-externC int sem_timedwait(sem_t *sem, struct timespec *abs_timeout);
-
 // Decrement value if >0, return -1 if not.
 externC int sem_trywait  (sem_t *sem);
 

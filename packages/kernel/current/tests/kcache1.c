@@ -109,7 +109,7 @@ static void time0(register cyg_uint32 stride)
     register cyg_uint32 j,k;
     cyg_tick_count_t count0, count1;
     cyg_ucount32 t;
-    register char c;
+    register char c CYGBLD_ATTRIB_UNUSED;
 
     count0 = cyg_current_time();
 
@@ -147,7 +147,7 @@ static void time0II(register cyg_uint32 stride)
     register cyg_uint32 j,k;
     cyg_tick_count_t count0, count1;
     cyg_ucount32 t;
-    register char c;
+    register char c CYGBLD_ATTRIB_UNUSED;
 
     count0 = cyg_current_time();
 
@@ -185,14 +185,11 @@ void time1II(void)
 #ifdef HAL_DCACHE_INVALIDATE_ALL
 static void time0DI(register cyg_uint32 stride)
 {
-//2011.05.01.DEL    register cyg_uint32 j,k;
-    register cyg_uint32 j __asm("r6");
-    register cyg_uint32 k __asm("r7");
-
+    register cyg_uint32 j,k;
     volatile cyg_tick_count_t count0;
     cyg_tick_count_t count1;
     cyg_ucount32 t;
-    register char c;
+    register char c CYGBLD_ATTRIB_UNUSED;
     register CYG_INTERRUPT_STATE oldints;
 
     count0 = cyg_current_time();
@@ -236,7 +233,7 @@ static void entry0( cyg_addrword_t data )
 {
     register CYG_INTERRUPT_STATE oldints;
 
- #ifdef HAL_CACHE_UNIFIED
+#ifdef HAL_CACHE_UNIFIED
 
     HAL_DISABLE_INTERRUPTS(oldints);
     HAL_DCACHE_PURGE_ALL();             // rely on above definition

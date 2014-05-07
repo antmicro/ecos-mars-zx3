@@ -1,3 +1,25 @@
+2013-06-13  Ilija Kocho <ilijak@siva.com.mk>
+
+	* tests/cache.c : Fix compiler warning about variable set but not used.
+	[ Bugzilla 1001865 ]
+
+2012-04-25  Ilija Kocho <ilijak@siva.com.mk>
+
+	* include/hal_stub.h, src/hal_stub.c, src/thread-packets.c:
+	NUMREGS replaced by HAL_STUB_REGISTERS_SIZE in thread-packets.c
+	[Bugzilla 1001558]
+
+2012-03-14  Grant Edwards <grant.b.edwards@gmail.com>
+
+	* src/generic-stub.c (process_query): Fix compiler warning about
+	variable that is set but not used (only used in conditionally
+	compiled code). [ Bugzilla 1001535 ]
+
+2012-03-09  Sergei Gavrikov  <sergei.gavrikov@gmail.com>
+
+	* src/hal_if.c (hal_ctrlc_check): Fix compiler warning about
+	variable that is set but not used (isr_ret has been removed).
+
 2011-01-13  John Dallaway  <john@dallaway.org.uk>
 
 	* cdl/hal.cdl: Add a CDL interface to control whether interrupt

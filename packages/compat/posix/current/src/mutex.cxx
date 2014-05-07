@@ -156,15 +156,6 @@ externC int pthread_mutexattr_getprotocol ( pthread_mutexattr_t *attr,
     PTHREAD_RETURN(0);
 }
 
-// Set mutex type
-externC int pthread_mutexattr_settype ( pthread_mutexattr_t *attr, int type)
-{
-    PTHREAD_ENTRY();
-    PTHREAD_CHECK(attr);
-    attr->type = type;
-    PTHREAD_RETURN(0);
-}
-
 #if defined(_POSIX_THREAD_PRIO_PROTECT)
 
 // Set priority for priority ceiling protocol
@@ -284,19 +275,6 @@ externC int pthread_mutex_init (pthread_mutex_t *mutex,
     Cyg_Mutex *mx = new((cyg_uint8 *)mutex) Cyg_Mutex(  protocol );
 
     mx = mx; // silence compiler warning
-
-    // Translate the POSIX type identifier into the eCos one.
-    switch ( use_attr.type ) {
-        case PTHREAD_MUTEX_RECURSIVE:
-            mx->set_type(Cyg_Mutex::RECURSIVE);
-            break;
-
-        case PTHREAD_MUTEX_NORMAL:
-        default:
-            mx->set_type(Cyg_Mutex::NORMAL);
-            break;
-    } /* switch */
-
 #if defined(_POSIX_THREAD_PRIO_PROTECT)
     if ( protocol == Cyg_Mutex::CEILING )
         mx->set_ceiling( use_attr.prioceiling );

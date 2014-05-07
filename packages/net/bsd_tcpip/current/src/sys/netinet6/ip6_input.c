@@ -222,7 +222,7 @@ int ip6_fw_enable = 1;
 
 struct ip6stat ip6stat;
 
-static void ip6_init2 __P((void *));
+void ip6_init2 __P((void *));
 static struct mbuf *ip6_setdstifaddr __P((struct mbuf *, struct in6_ifaddr *));
 
 static int ip6_hopopts_input __P((u_int32_t *, u_int32_t *, struct mbuf **, int *));
@@ -338,7 +338,7 @@ ip6_init()
 #endif
 }
 
-static void
+void
 ip6_init2(dummy)
 	void *dummy;
 {
@@ -1362,7 +1362,6 @@ ip6_hopopts_input(plenp, rtalertp, mp, offp)
 	struct mbuf *m = *mp;
 	int off = *offp, hbhlen;
 	struct ip6_hbh *hbh;
-	u_int8_t *opt;
 
 	/* validation of the length of the header */
 #ifndef PULLDOWN_TEST
@@ -1389,7 +1388,6 @@ ip6_hopopts_input(plenp, rtalertp, mp, offp)
 #endif
 	off += hbhlen;
 	hbhlen -= sizeof(struct ip6_hbh);
-	opt = (u_int8_t *)hbh + sizeof(struct ip6_hbh);
 
 	if (ip6_process_hopopts(m, (u_int8_t *)hbh + sizeof(struct ip6_hbh),
 				hbhlen, rtalertp, plenp) < 0)
@@ -1914,7 +1912,7 @@ ip6_savecontrol(in6p, ip6, m, ctl, prevctlp)
 				struct ip6_rthdr *prevrth = NULL;
 				int prevrhlen = 0;
 
-				if (!in6p->in6p_flags & IN6P_RTHDR)
+				if (!(in6p->in6p_flags & IN6P_RTHDR))
 					break;
 
 				if (prevctl && prevctl->rthdr) {
@@ -2274,7 +2272,7 @@ ip6_get_prevhdr(m, off)
 	struct ip6_hdr *ip6 = mtod(m, struct ip6_hdr *);
 
 	if (off == sizeof(struct ip6_hdr))
-		return(&ip6->ip6_nxt);
+		return((char*)&ip6->ip6_nxt);
 	else {
 		int len, nxt;
 		struct ip6_ext *ip6e = NULL;
@@ -2298,7 +2296,7 @@ ip6_get_prevhdr(m, off)
 			nxt = ip6e->ip6e_nxt;
 		}
 		if (ip6e)
-			return(&ip6e->ip6e_nxt);
+			return((char*)&ip6e->ip6e_nxt);
 		else
 			return NULL;
 	}

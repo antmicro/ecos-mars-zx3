@@ -75,10 +75,7 @@
 #define CPSR_FIQ_MODE		0x11
 #define CPSR_IRQ_MODE		0x12
 #define CPSR_SUPERVISOR_MODE	0x13
-#define CPSR_MONITOR_MODE	0x16
-#define CPSR_ABORT_MODE		0x17
 #define CPSR_UNDEF_MODE		0x1B
-#define CPSR_SYSTEM_MODE	0x1F
 
 // The following are not supported by every CPU, but if
 // they are, they have the following values:
@@ -91,8 +88,11 @@
 #define CPSR_MODE_BITS          0x1F
 
 #define CPSR_INITIAL (CPSR_IRQ_DISABLE|CPSR_FIQ_DISABLE|CPSR_SUPERVISOR_MODE)
+#ifdef CYGOPT_HAL_ARM_FIQ_DISABLE
 #define CPSR_THREAD_INITIAL (CPSR_SUPERVISOR_MODE)
-
+#else
+#define CPSR_THREAD_INITIAL (CPSR_SUPERVISOR_MODE|CPSR_FIQ_DISABLE)
+#endif
 //
 // Vector table offsets
 //
@@ -147,12 +147,6 @@ typedef struct
     cyg_uint32  svc_lr;                           // saved svc mode lr
     cyg_uint32  svc_sp;                           // saved svc mode sp
 
-#if defined(CYGHWR_HAL_ARM_NEON) || defined(CYGHWR_HAL_ARM_FPU)
-    cyg_uint64  f[32];                            // 32x64 NEON or VFP registers
-    cyg_uint32  fpscr;                            // float-point status and control register
-    cyg_uint32  reserved;                         // 64bit alignment
-#endif
-
 } HAL_SavedRegisters;
 
 //-------------------------------------------------------------------------
@@ -182,18 +176,6 @@ externC int hal_msbindex(int);
 // _entry_ entry point address.
 // _id_ bit pattern used in initializing registers, for debugging.
 
-// Optional FPU context initialization
-#if defined(CYGHWR_HAL_ARM_NEON) || defined(CYGHWR_HAL_ARM_FPU)
-#define HAL_THREAD_INIT_FPU_CONTEXT( _regs_, _id_ )                             \
-{                                                                               \
-    for( _i_ = 0; _i_ < 32; _i_++ ) (_regs_)->f[_i_] = (_id_)|0xFF00|_i_;       \
-    (_regs_)->fpscr = 0x00000000;                                               \
-}
-#else
-#define HAL_THREAD_INIT_FPU_CONTEXT( _regs_, _id_ )
-#endif
-
-
 #define HAL_THREAD_INIT_CONTEXT( _sparg_, _thread_, _entry_, _id_ )         \
     CYG_MACRO_START                                                         \
     register CYG_WORD _sp_ = ((CYG_WORD)_sparg_) &~15;                      \
@@ -208,7 +190,6 @@ externC int hal_msbindex(int);
     (_regs_)->lr = (CYG_WORD)(_entry_);     /* LR = entry point       */    \
     (_regs_)->pc = (CYG_WORD)(_entry_);     /* PC = [initial] entry point */\
     (_regs_)->cpsr = (CPSR_THREAD_INITIAL); /* PSR = Interrupt enabled */   \
-    HAL_THREAD_INIT_FPU_CONTEXT( _regs_, _id_ )                             \
     _sparg_ = (CYG_ADDRESS)_regs_;                                          \
     CYG_MACRO_END
 
@@ -409,29 +390,26 @@ externC void hal_longjmp(hal_jmp_buf env, int val);
 // under "enough rope" sort of disclaimers.
 
 // A minimal, optimized stack frame, rounded up - no autos
-#if defined(CYGHWR_HAL_ARM_NEON) || defined(CYGHWR_HAL_ARM_FPU)
-#define CYGNUM_HAL_STACK_FRAME_SIZE ((4 * 20) + (2 * 20) + (8 * 32))
-#else
 #define CYGNUM_HAL_STACK_FRAME_SIZE (4 * 20)
-#endif
+
 // Stack needed for a context switch: this is implicit in the estimate for
 // interrupts so not explicitly used below:
-#define CYGNUM_HAL_STACK_CONTEXT_SIZE CYGNUM_HAL_STACK_FRAME_SIZE
+#define CYGNUM_HAL_STACK_CONTEXT_SIZE (4 * 20)
 
 // Interrupt + call to ISR, interrupt_end() and the DSR
 #define CYGNUM_HAL_STACK_INTERRUPT_SIZE \
-    (CYGNUM_HAL_STACK_FRAME_SIZE + (2 * CYGNUM_HAL_STACK_FRAME_SIZE))
+    ((4 * 20) + 2 * CYGNUM_HAL_STACK_FRAME_SIZE)
 
 // Space for the maximum number of nested interrupts, plus room to call functions
 #define CYGNUM_HAL_MAX_INTERRUPT_NESTING 4
 
 #define CYGNUM_HAL_STACK_SIZE_MINIMUM \
-        ((CYGNUM_HAL_MAX_INTERRUPT_NESTING * CYGNUM_HAL_STACK_INTERRUPT_SIZE) + \
-         (2 * CYGNUM_HAL_STACK_FRAME_SIZE))
+        (CYGNUM_HAL_MAX_INTERRUPT_NESTING * CYGNUM_HAL_STACK_INTERRUPT_SIZE + \
+         2 * CYGNUM_HAL_STACK_FRAME_SIZE)
 
 #define CYGNUM_HAL_STACK_SIZE_TYPICAL \
         (CYGNUM_HAL_STACK_SIZE_MINIMUM + \
-         (16 * CYGNUM_HAL_STACK_FRAME_SIZE))
+         16 * CYGNUM_HAL_STACK_FRAME_SIZE)
 
 //--------------------------------------------------------------------------
 // Macros for switching context between two eCos instances (jump from

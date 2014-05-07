@@ -91,10 +91,6 @@ main(void)
     DEFINE(armreg_vector, offsetof(HAL_SavedRegisters, vector));
     DEFINE(armreg_svclr, offsetof(HAL_SavedRegisters, svc_lr));
     DEFINE(armreg_svcsp, offsetof(HAL_SavedRegisters, svc_sp));
-#ifdef CYGHWR_HAL_ARM_NEON
-    DEFINE(armreg_f0, offsetof(HAL_SavedRegisters, f[0]));
-    DEFINE(armreg_fpscr, offsetof(HAL_SavedRegisters, fpscr));
-#endif
     DEFINE(ARMREG_SIZE, sizeof(HAL_SavedRegisters));
     DEFINE(CYGNUM_HAL_ISR_COUNT, CYGNUM_HAL_ISR_COUNT);
     DEFINE(CYGNUM_HAL_VSR_COUNT, CYGNUM_HAL_VSR_COUNT);
@@ -117,9 +113,6 @@ main(void)
     DEFINE(CPSR_FIQ_MODE, CPSR_FIQ_MODE);
     DEFINE(CPSR_SUPERVISOR_MODE, CPSR_SUPERVISOR_MODE);
     DEFINE(CPSR_UNDEF_MODE, CPSR_UNDEF_MODE);
-    DEFINE(CPSR_MONITOR_MODE, CPSR_MONITOR_MODE);
-    DEFINE(CPSR_ABORT_MODE, CPSR_ABORT_MODE);
-    DEFINE(CPSR_SYSTEM_MODE, CPSR_SYSTEM_MODE);
     DEFINE(CPSR_MODE_BITS, CPSR_MODE_BITS);
     DEFINE(CPSR_INITIAL, CPSR_INITIAL);
     DEFINE(CPSR_THREAD_INITIAL, CPSR_THREAD_INITIAL);
@@ -147,6 +140,8 @@ main(void)
     DEFINE(HAL_BREAKINST_THUMB, HAL_BREAKINST_THUMB);
     DEFINE(HAL_BREAKINST_ARM, HAL_BREAKINST_ARM);
 
+    DEFINE(CPSR_INTR_MASK, CPSR_INTR_MASK);
+    
     return 0;
 }
 

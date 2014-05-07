@@ -594,11 +594,6 @@ enum cyg_mutex_protocol
 };
 #endif
 
-typedef enum {
-  CYG_MUTEX_TYPE_NORMAL = 0,
-  CYG_MUTEX_TYPE_RECURSIVE,
-} cyg_mutex_type_t;
-
 void cyg_mutex_init(
     cyg_mutex_t        *mutex          /* Mutex to init                      */
 ) __THROW;
@@ -620,8 +615,6 @@ void cyg_mutex_set_ceiling( cyg_mutex_t *mutex, cyg_priority_t priority ) __THRO
 #ifdef CYGSEM_KERNEL_SYNCH_MUTEX_PRIORITY_INVERSION_PROTOCOL_DYNAMIC
 void cyg_mutex_set_protocol ( cyg_mutex_t *mutex, enum cyg_mutex_protocol protocol ) __THROW;
 #endif
-
-externC void cyg_mutex_set_type ( cyg_mutex_t *mutex, cyg_mutex_type_t type ) __THROW;
 
 /*---------------------------------------------------------------------------*/
 /* Condition Variables                                                       */

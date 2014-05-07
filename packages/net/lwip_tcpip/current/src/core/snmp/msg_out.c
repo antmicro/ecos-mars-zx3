@@ -96,7 +96,7 @@ snmp_trap_dst_ip_set(u8_t dst_idx, struct ip_addr *dst)
 {
   if (dst_idx < SNMP_TRAP_DESTINATIONS)
   {
-    trap_dst[dst_idx].dip.addr = htonl(dst->addr);
+    trap_dst[dst_idx].dip.addr = dst->addr;
   }
 }
 
@@ -269,11 +269,8 @@ snmp_send_trap(s8_t generic_trap, struct snmp_obj_id *eoid, s32_t specific_trap)
         snmp_inc_snmpouttraps();
         snmp_inc_snmpoutpkts();
 
-        /** connect to the TRAP destination */
-        udp_connect(trap_msg.pcb, &trap_msg.dip, SNMP_TRAP_PORT);
-        udp_send(trap_msg.pcb, p);
-        /** disassociate remote address and port with this pcb */
-        udp_disconnect(trap_msg.pcb);
+        /** send to the TRAP destination */
+        udp_sendto(trap_msg.pcb, p, &trap_msg.dip, SNMP_TRAP_PORT);
 
         pbuf_free(p);
       }

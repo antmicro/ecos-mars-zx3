@@ -236,38 +236,28 @@ eth_drv_init(struct eth_drv_sc *sc, unsigned char *enaddr)
         IP4_ADDR(&netmask, 0, 0, 0, 0);
         IP4_ADDR(&gateway, 0, 0, 0, 0);
     }
-    diag_printf("after ip conf\n");
-	
+    
     netif_add(netif, &addr, &netmask, &gateway, netif->state,
               eth_netif_init, lwip_eth_drv_input);
     
-	diag_printf("after netif_add\n");
     lwip_eth_drv_new(netif);
     
-	diag_printf("after eth_drv_new\n");
     if (conf && conf->def)
         netif_set_default(netif);
-    	
-	diag_printf("after set default\n");
+    
     // Set up hardware address
     memcpy(netif->hwaddr, enaddr, ETHER_ADDR_LEN);
     (sc->funs->start)(sc, (unsigned char *) &netif->hwaddr, 0);
-    	
-	diag_printf("after set up MAC\n");
-    if (conf && !conf->dhcp){
-        netif_set_up(netif);
-	diag_printf("after netif_set_up (no DHCP)\n");
-	}
     
-		
+    if (conf && !conf->dhcp)
+        netif_set_up(netif);
+    
 #if LWIP_DHCP
     // Start DHCP if configured
     if (conf && conf->dhcp) {
         dhcp_start(netif);
-	diag_printf("after dhcp_start\n");
     }
 #endif
-	diag_printf("leaving eth_drv_init\n");
 }
 
 //

@@ -93,22 +93,9 @@ _name_:
         
 FUNC_START_ARM(hal_thread_switch_context, r2)
         mov     ip,sp
-#if defined(CYGHWR_HAL_ARM_NEON)
-        sub     sp,sp,#(ARMREG_SIZE - armreg_fpscr)	// skip fpscr
-        vstmdb	sp!,{d16-d31}
-        vstmdb	sp!,{d0-d15}
-        sub		sp,sp,#(5*4)
-#else
-        sub     sp,sp,#(ARMREG_SIZE - armreg_lr - 4)	// skip svc_sp, svc_lr, vector, cpsr, and pc
-#endif
+        sub     sp,sp,#(ARMREG_SIZE - armreg_lr - 4) // skip svc_sp, svc_lr, vector, cpsr, and pc
         stmfd   sp!,{ip,lr}
         stmfd   sp!,{r0-r10,fp,ip}
-
-#if defined(CYGHWR_HAL_ARM_NEON)
-        vmrs	r2, fpscr
-        str	r2, [sp,#armreg_fpscr]			// store fpscr
-#endif
-
         mrs     r2,cpsr
         str     r2,[sp,#armreg_cpsr]
         str     sp,[r1]                 // return new stack pointer
@@ -131,15 +118,6 @@ FUNC_START_ARM(hal_thread_load_context, r2)
         mrs     r0,cpsr                 // disable IRQ's
         orr     r0,r0,#CPSR_IRQ_DISABLE|CPSR_FIQ_DISABLE
         msr     cpsr,r0
-
-#if defined(CYGHWR_HAL_ARM_NEON) || defined(CYGHWR_HAL_ARM_FPU)
-        add     r0, fp, #armreg_fpscr
-        vldmdb	r0!,{d16-d31}
-        vldmdb	r0!,{d0-d15}
-        ldr     r0, [fp,#armreg_fpscr]
-        vmsr	fpscr, r0
-#endif
-
         ldr     r0,[fp,#armreg_cpsr]
         msr     spsr,r0
         ldmfd   fp,{r0-r10,fp,ip,sp,lr}

@@ -1,3 +1,20 @@
+2013-04-09  Tomas Frydrych <tomas@sleepfive.com>
+
+	* cdl/hal_cortexm_kinetis_kwikstik.cdl:
+	* include/plf_io.h:
+	Implemented support for I2C  [Bugzilla 1001397]
+
+2013-04-01  Ilija Kocho  <ilijak@siva.com.mk>
+
+	* src/kwikstik_misc.c: Clock gating synchronised with variant.
+	[ Bugzilla 1001814 ]
+
+2012-11-06  Ilija Kocho  <ilijak@siva.com.mk>
+
+	* cdl/hal_cortexm_kinetis_kwikstik.cdl:
+	Sync with variant changes due to hardware floating point support.
+	Changed CYGHWR_HAL_CORTEXM_KINETIS_FLEXNVM.    [Bugzilla 1001607]
+
 2011-12-15  Tomas Frydrych  <tomas@sleepfive.com>
 
 	* cdl/hal_cortexm_kinetis_kwikstik.cdl:

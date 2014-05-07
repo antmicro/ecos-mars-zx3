@@ -1,3 +1,42 @@
+2013-07-09  Mike Jones <mjones@proclivis.com>
+
+	* src/spi_freescale_dspi.c: Fix: Kinetis DSPI infinite polling
+	[ Bugzilla 10011879 ]
+
+2013-05-08  Ilija Kocho <ilijak@siva.com.mk>
+
+	* src/spi_freescale_dspi.cdl: Add CYGINT_DEVS_SPI_DMA_USE
+	* src/spi_freescale_dspi.c: Fix: Disable DMA requests for transfers
+	that don't use DMA. [ Bugzilla 1001815 ]
+
+2013-04-01  Ilija Kocho <ilijak@siva.com.mk>
+
+	* include/spi_freescale_dspi.h, include/spi_freescale_busses.inl
+	* include/spi_freescale_dspi_io.h, src/spi_freescale_dspi.c:
+	Optimised receiving of messages that fit in FIFO. Add clock gating.
+	Fix race condition bug in dspi_transaction_end(). [ Bugzilla 1001815 ]
+
+2013-02-06  Stefan Singer <stefan.singer@freescale.com>
+		    Ilija Kocho <ilijak@siva.com.mk>
+
+	* include/spi_freescale_dspi.h, include/spi_freescale_busses.inl
+	* include/spi_freescale_dspi_io.h, include/spi_freescale_dspi_bd.h,
+	* src/spi_freescale_dspi.c:
+	enhanced endianness support for devices with big and little endian
+	added support for MPC5xxx in addition to Kinetis
+	extended support for up to 8 DSPIs
+	(see Bugzilla 1001752).
+
+2012-12-28  Ilija Kocho <ilijak@siva.com.mk>
+
+	* cdl/spi_freescale_dspi.cdl, src/spi_freescale_dspi.c:
+	Tick-only now has option to beehive like other drivers
+	rather than RM (see Bugzilla 1001676).
+	Fixed bug with dropping CS. Chip select options consolidated in a for loop.
+
+	* tests/spi_loopback.c: New file. Add looback test.
+	[Bugzilla 1001719]
+
 2012-05-04  Ilija Kocho <ilijak@siva.com.mk>
 
 	* cdl/spi_freescale_dspi.cdl: 

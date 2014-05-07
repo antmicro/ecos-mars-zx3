@@ -354,4 +354,3 @@ OUTPUT_FORMAT(elf32-bigarm)
 
 #include <pkgconf/hal_arm.h>
 #include CYGHWR_MEMORY_LAYOUT_LDI
-

@@ -421,14 +421,6 @@ ping_test(struct bootp *bp)
 void
 net_test(cyg_addrword_t p)
 {
-
-	int sec = 0;
-	//while(1)
-	//{
-	//cyg_thread_delay(1000);
-	//diag_printf("sec = %d\n",sec);
-	//sec++;
-	//}		
 #ifdef CYGPKG_NET_INET6
     struct sockaddr_in6 ipv6router;
 #endif

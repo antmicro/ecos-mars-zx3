@@ -1,3 +1,73 @@
+2013-03-03  Mike Jones  <mike@proclivis.com>
+
+	* src/core/snmp/msg_out.c: Applied lwip bugfix #29256.
+	ip_addr_set_hton(...) does not exist in this revision,
+	so an equivalent solution was provided. The application
+	was retested. Any application that worked around the problem by
+	using htonl(...) will need to be changed by removing it.
+	[ Bugzilla 1001789 ]
+
+2012-05-26  Ilija Kocho  <ilijak@siva.com.mk>
+
+	* tests/nc_test_slave.c: Reduced stack sizes of IDLE, LOAD and TMAIN
+	threads as well as NUM_LOAD_THREADS to 5 (was 10) in order to fit the
+	test for targets with as low as 128KiB RAM.
+	Bug fix: MAX_BUF fixed so that in_buf[] and out_buf[] can accomodate
+	10KiB messages.
+	[ Bugzilla 1001344 ]
+
+2012-03-06  Ilija Kocho  <ilijak@siva.com.mk>
+
+    * src/core/tcp_out.c: Fix compiler warning about unused variables.
+    [Bugzilla 1001521]
+
+2011-08-23  Ilija Kocho  <ilijak@siva.com.mk>
+
+	* tests/nc_test_slave.c: Reduced stack sizes of IDLE, LOAD and TMAIN
+	threads as well as NUM_LOAD_THREADS to 5 (was 10) in order to fit the
+	test for targets with as low as 128KiB RAM.
+	[ Bugzilla 1001344 ]
+
+2011-08-25  John Dallaway  <john@dallaway.org.uk>
+
+	* include/lwipopts.h: Fix naming of
+	CYGNUM_LWIP_NETIF_LOOPBACK_MAX_PBUFS. Patch from Christophe Coutand.
+	[ Bugzilla 1001323 ]
+
+2011-08-23  Ilija Kocho  <ilijak@siva.com.mk>
+
+	* cdl/lwip_net.cdl: New CDL option CYGIMP_LWIP_ENDIAN_BY_HAL.
+	* include/lwipopts.h: Add HAL override of htonl() and htons().
+	[ Bugzilla 1001275 ]
+
+2011-03-08  John Dallaway  <john@dallaway.org.uk>
+
+	* cdl/lwip_net.cdl: Require CYGPKG_ISOINFRA.
+	* include/arch/cc.h: Define ERRNO if CYGINT_ISO_ERRNO is
+	implemented. Based on patch from Will Wagner. [ Bugzilla 1001169 ]
+
+2011-01-30  Ilija Kocho  <ilijak@siva.com.mk>
+
+	* cdl/lwip_net.cdl: New CDL option CYGSEM_LWIP_MEM_SECTION.
+	* include/lwipopts.h: Enter MEM_SECTION entity.
+	* src/mem.c, src/memp.c: Add an ability to use GCC section
+	attribute for statically allocated buffers, pbufs, and heap.
+
+2011-01-02  Ilija Kocho  <ilijak@siva.com.mk>
+
+	* src/ecos/sequential.c, src/ecos/simple.c: Fixed miltiple-line
+	comment warnings.
+
+2010-12-10  Christophe Coutand  <ccoutand@stmi.com>
+
+	* include/lwipopts.h: Fix compilation error when compiling SNMP
+	code.
+
+2010-08-02  John Dallaway  <john@dallaway.org.uk>
+
+	* include/network.h: Match braces when including from C++ code.
+	Issue reported by Will Wagner.
+
 2010-02-07  John Dallaway  <john@dallaway.org.uk>
 
 	* cdl/lwip_net.cdl: Rename CFLAGS_ADD and CFLAGS_REMOVE options to
@@ -217,7 +287,7 @@
 //####ECOSGPLCOPYRIGHTBEGIN####
 // -------------------------------------------
 // This file is part of eCos, the Embedded Configurable Operating System.
-// Copyright (C) 2004, 2010 Free Software Foundation 
+// Copyright (C) 2004, 2010, 2011 Free Software Foundation 
 //
 // eCos is free software; you can redistribute it and/or modify it under
 // the terms of the GNU General Public License as published by the Free

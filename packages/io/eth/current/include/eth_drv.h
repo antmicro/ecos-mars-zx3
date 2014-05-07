@@ -50,9 +50,6 @@
 //
 //==========================================================================
 
-/** \file eth_drv.h
- * High level networking driver interfaces.
- */
 // Ethernet driver structure
 
 #ifndef _ETH_DRV_H_
@@ -154,12 +151,6 @@ struct arpcom {
 };
 #endif
 
-#ifdef CYGPKG_IO_ETH_DRIVERS_PROFINET	// Added
-struct arpcom {
-    unsigned char esa[6];
-};
-#endif
-
 #ifdef CYGPKG_NET_LWIP
 struct arpcom {
     struct netif ac_if;
@@ -222,36 +213,20 @@ cyg_netdevtab_entry_t *eth_drv_netdev(char *name);
 #endif // CYGPKG_IO_PCMCIA
 
 // Control 'key's
-#define ETH_DRV_SET_MAC_ADDRESS                     0x0100
-#ifdef CYGPKG_NET
-# define ETH_DRV_GET_IF_STATS_UD                    0x0101
-# define ETH_DRV_GET_IF_STATS                       0x0102
-# include <cyg/io/eth/eth_drv_stats.h> // The struct * for those ops.
-#endif /* CYGPKG_NET */
-#define ETH_DRV_SET_MC_LIST                         0x0110   // Set multicast list
-#define ETH_DRV_SET_MC_ALL                          0x0111   // Set multicast all mode
-#define ETH_DRV_GET_MAC_ADDRESS						0x0103	 // Added
-#define ETH_DRV_ADD_MC								0x0300	 // Added
-#define ETH_DRV_REM_MC								0x0301	 // Added
+#define ETH_DRV_SET_MAC_ADDRESS 0x0100
 
 #ifdef CYGPKG_NET
-# ifdef CYGPKG_IO_PCMCIA
-#  define ETH_DRV_SET_WLAN_SSID                     0x0200  /* (char *) */
-#  define ETH_DRV_SET_WLAN_CHANNEL                  0x0201  /* (unsigned short) */
-#  define ETH_DRV_SET_WLAN_SPEED                    0x0202  /* (unsigned short) */
-#  define ETH_DRV_SET_WLAN_NWKMODE                  0x0203  /* (unsigned short) */
-#  define ETH_DRV_SET_WLAN_PWRMODE                  0x0204  /* (unsigned short) */
-#  define ETH_DRV_SET_WLAN_AUTH                     0x0205  /* (unsigned char) */
-#  define ETH_DRV_SET_WLAN_ANTENNA                  0x0207  /* (unsigned short) */
-#  define ETH_DRV_SET_WLAN_PREAMBLE                 0x0208  /* (unsigned short) */
-#  define ETH_DRV_SET_WLAN_COUNTRY                  0x020a  /* (char *) */
-# endif /* CYGPKG_IO_PCMCIA */
-#endif /* CYGPKG_NET */
+#define ETH_DRV_GET_IF_STATS_UD 0x0101
+#define ETH_DRV_GET_IF_STATS    0x0102
+#include <cyg/io/eth/eth_drv_stats.h> // The struct * for these ops.
+#endif
 
 #ifndef ETHER_ADDR_LEN
 #define ETHER_ADDR_LEN 6
 #endif
 
+#define ETH_DRV_SET_MC_LIST     0x0110   // Set multicast list
+#define ETH_DRV_SET_MC_ALL      0x0111   // Set multicast all mode
 #define ETH_DRV_MAX_MC 8
 struct eth_drv_mc_list {
     int len;

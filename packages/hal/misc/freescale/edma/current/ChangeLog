@@ -1,3 +1,33 @@
+2014-02-13  Ilija Kocho <ilijak@siva.com.mk>
+
+	* misc/freescale/edma/current/doc/edma.sgml
+	* misc/freescale/edma/current/doc/freescale_begin.sgml
+	* misc/freescale/edma/current/doc/freescale_end.sgml
+	New: Add Freescale eDMA to eCos reference manual.
+
+2013-08-26  Ilija Kocho <ilijak@siva.com.mk>
+
+	* include/freescale_edma.h: Fix FREESCALE_EDMA_NBYTES_MLOFFYES_NBYTES_M bug
+	[ Bugzilla 1001896 ]
+
+2013-05-04  Ilija Kocho <ilijak@siva.com.mk>
+
+	* cdl/hal_freescale_edma.cdl: Remove requirement for WRITETHRU cache mode
+	that raised conflict when cache was disabled. Bug reported by Mike Jones.
+	[ Bugzilla 1001838 ]
+
+2013-04-01  Ilija Kocho <ilijak@siva.com.mk>
+
+	* src/hal_freescale_edma.c:	Add clock gating enable.
+
+2013-02-06  Stefan Singer <stefan.singer@freescale.com>
+		    Ilija Kocho <ilijak@siva.com.mk>
+
+	* include/freescale_edma.h src/hal_freescale_edma.c:	
+	enhanced endianness support for devices with big and little endian
+	added support for MPC5xxx in addition to Kinetis
+	(see Bugzilla 1001752).
+	
 2012-05-04  Ilija Kocho  <ilijak@siva.com.mk>
 
 	* cdl/hal_freescale_edma.cdl

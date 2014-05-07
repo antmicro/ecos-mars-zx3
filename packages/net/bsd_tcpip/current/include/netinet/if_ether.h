@@ -134,11 +134,9 @@ extern u_char	ether_ipmulticast_min[ETHER_ADDR_LEN];
 extern u_char	ether_ipmulticast_max[ETHER_ADDR_LEN];
 extern struct	ifqueue arpintrq;
 
-int     arpresolve __P((struct arpcom *, struct rtentry *, struct mbuf *, struct sockaddr *, u_char *, struct rtentry *));
-void    arprequest __P((struct arpcom *, struct in_addr *, struct in_addr *, u_char *));
-struct llinfo_arp * arplookup __P((u_long, int, int));
+int	arpresolve __P((struct arpcom *, struct rtentry *, struct mbuf *,
+			struct sockaddr *, u_char *, struct rtentry *));
 void	arp_ifinit __P((struct arpcom *, struct ifaddr *));
-void    arp_setauxin_func __P(( void (*inaddrFunc)(in_addr_t, unsigned char *) ));
 #endif
 
 #endif

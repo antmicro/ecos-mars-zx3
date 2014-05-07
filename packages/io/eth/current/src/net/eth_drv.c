@@ -5,37 +5,37 @@
 //      Hardware independent ethernet driver
 //
 //==========================================================================
-// ####ECOSGPLCOPYRIGHTBEGIN####
-// -------------------------------------------
-// This file is part of eCos, the Embedded Configurable Operating System.
+// ####ECOSGPLCOPYRIGHTBEGIN####                                            
+// -------------------------------------------                              
+// This file is part of eCos, the Embedded Configurable Operating System.   
 // Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003 Free Software Foundation, Inc.
 //
-// eCos is free software; you can redistribute it and/or modify it under
-// the terms of the GNU General Public License as published by the Free
-// Software Foundation; either version 2 or (at your option) any later
-// version.
+// eCos is free software; you can redistribute it and/or modify it under    
+// the terms of the GNU General Public License as published by the Free     
+// Software Foundation; either version 2 or (at your option) any later      
+// version.                                                                 
 //
-// eCos is distributed in the hope that it will be useful, but WITHOUT
-// ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-// FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-// for more details.
+// eCos is distributed in the hope that it will be useful, but WITHOUT      
+// ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or    
+// FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License    
+// for more details.                                                        
 //
-// You should have received a copy of the GNU General Public License
-// along with eCos; if not, write to the Free Software Foundation, Inc.,
-// 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+// You should have received a copy of the GNU General Public License        
+// along with eCos; if not, write to the Free Software Foundation, Inc.,    
+// 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.            
 //
-// As a special exception, if other files instantiate templates or use
-// macros or inline functions from this file, or you compile this file
-// and link it with other works to produce a work based on this file,
-// this file does not by itself cause the resulting work to be covered by
-// the GNU General Public License. However the source code for this file
-// must still be made available in accordance with section (3) of the GNU
-// General Public License v2.
+// As a special exception, if other files instantiate templates or use      
+// macros or inline functions from this file, or you compile this file      
+// and link it with other works to produce a work based on this file,       
+// this file does not by itself cause the resulting work to be covered by   
+// the GNU General Public License. However the source code for this file    
+// must still be made available in accordance with section (3) of the GNU   
+// General Public License v2.                                               
 //
-// This exception does not invalidate any other reasons why a work based
-// on this file might be covered by the GNU General Public License.
-// -------------------------------------------
-// ####ECOSGPLCOPYRIGHTEND####
+// This exception does not invalidate any other reasons why a work based    
+// on this file might be covered by the GNU General Public License.         
+// -------------------------------------------                              
+// ####ECOSGPLCOPYRIGHTEND####                                              
 //==========================================================================
 //#####DESCRIPTIONBEGIN####
 //
@@ -43,8 +43,8 @@
 // Contributors: gthomas
 // Date:         2000-01-10
 // Purpose:      Hardware independent ethernet driver
-// Description:
-//
+// Description:  
+//              
 //
 //####DESCRIPTIONEND####
 //
@@ -146,8 +146,8 @@ static struct simulated_failure_state {
 static int
 simulate_fail( struct eth_drv_sc *sc, int which )
 {
-    struct simulated_failure_state *s;
-
+    struct simulated_failure_state *s;  
+    
     for ( s = &simulated_failure_states[0]; s < &simulated_failure_states[2];
           s++ ) {
         if ( 0 == s->sc ) {
@@ -270,7 +270,7 @@ simulate_fail_corrupt_sglist( struct eth_drv_sg *sg_list, int sg_len )
             return;
         }
         off -= sg_list[i].len;
-    }
+    }    
     CYG_FAIL( "Didn't corrupt anything" );
 }
 
@@ -321,7 +321,7 @@ static int  eth_drv_ioctl(struct ifnet *, u_long, caddr_t);
 static void eth_drv_send(struct ifnet *);
 static void eth_drv_start(struct eth_drv_sc *sc);
 
-#ifdef CYGDBG_IO_ETH_DRIVERS_DEBUG
+#ifdef CYGDBG_IO_ETH_DRIVERS_DEBUG 
 int cyg_io_eth_net_debug = CYGDBG_IO_ETH_DRIVERS_DEBUG_VERBOSITY;
 #endif
 
@@ -339,9 +339,7 @@ struct eth_drv_funs eth_drv_funs = {eth_drv_init, eth_drv_recv, eth_drv_tx_done}
 //
 static void
 eth_drv_init(struct eth_drv_sc *sc, unsigned char *enaddr)
-
 {
-	diag_printf("entering eth_drv-init\n");
     struct ifnet *ifp = &sc->sc_arpcom.ac_if;
 #ifdef CYGPKG_NET_FREEBSD_STACK
     int unit;
@@ -422,8 +420,8 @@ eth_drv_start(struct eth_drv_sc *sc)
     // resend multicast addresses if present
     if(ifp->if_multiaddrs.lh_first && ifp->if_ioctl) {
         int s = splimp();
-    ifp->if_ioctl(ifp, SIOCADDMULTI, 0);
-    splx(s);
+	ifp->if_ioctl(ifp, SIOCADDMULTI, 0);
+	splx(s);
     }
 #endif
     // Set 'running' flag, and clear output active flag.
@@ -436,7 +434,7 @@ eth_drv_start(struct eth_drv_sc *sc)
 //
 // This function supports "I/O control" operations on an interface.
 //
-static int
+static int  
 eth_drv_ioctl(struct ifnet *ifp, u_long cmd, caddr_t data)
 {
     struct eth_drv_sc *sc = ifp->if_softc;
@@ -545,7 +543,7 @@ eth_drv_ioctl(struct ifnet *ifp, u_long cmd, caddr_t data)
     case SIOCADDMULTI:
     case SIOCDELMULTI:
     {
-    struct ifmultiaddr *ifma;
+	struct ifmultiaddr *ifma;
         struct eth_drv_mc_list mc_list;
         int mode = (ifp->if_flags & IFF_ALLMULTI) ? ETH_DRV_SET_MC_ALL :
                                                     ETH_DRV_SET_MC_LIST;
@@ -555,9 +553,9 @@ eth_drv_ioctl(struct ifnet *ifp, u_long cmd, caddr_t data)
 #endif
         mc_list.len = 0;
         LIST_FOREACH(ifma, &((ifp)->if_multiaddrs), ifma_link) {
-        if (ifma->ifma_addr->sa_family != AF_LINK) {
-          continue;
-        }
+  	    if (ifma->ifma_addr->sa_family != AF_LINK) {
+	      continue;
+	    }
 #ifdef DEBUG
             log_dump(LOG_ADDR, LLADDR((struct sockaddr_dl *)ifma->ifma_addr), 6);
 #endif
@@ -575,7 +573,7 @@ eth_drv_ioctl(struct ifnet *ifp, u_long cmd, caddr_t data)
                 mode = ETH_DRV_SET_MC_ALL;
             }
         }
-        // Note: drivers may behave like IFF_ALLMULTI if the list is
+        // Note: drivers may behave like IFF_ALLMULTI if the list is 
         // more than their hardware can handle, e.g. some can only handle 1.
         if ((sc->funs->control)(sc, mode, &mc_list, sizeof(mc_list))) {
             diag_printf( "[%s] Warning: Driver can't set multi-cast mode\n",
@@ -597,7 +595,7 @@ eth_drv_ioctl(struct ifnet *ifp, u_long cmd, caddr_t data)
 
 //
 // Control whether any special locking needs to take place if we intend to
-// cooperate with a ROM monitor (e.g. RedBoot) using this hardware.
+// cooperate with a ROM monitor (e.g. RedBoot) using this hardware.  
 //
 #if defined(CYGSEM_HAL_USE_ROM_MONITOR) && \
     defined(CYGSEM_HAL_VIRTUAL_VECTOR_DIAG) && \
@@ -620,7 +618,7 @@ eth_drv_ioctl(struct ifnet *ifp, u_long cmd, caddr_t data)
 // This routine is called to start transmitting if there is data
 // available.
 //
-static void
+static void 
 eth_drv_send(struct ifnet *ifp)
 {
     struct eth_drv_sc *sc = ifp->if_softc;
@@ -646,10 +644,7 @@ eth_drv_send(struct ifnet *ifp)
     if ((ifp->if_flags & IFF_RUNNING) != IFF_RUNNING) {
          return;
     }
-    /* TO BE REMOVED !! - add in for debugging */
-    if (IF_QFULL(&ifp->if_snd)) {
-        diag_printf("The queue is full now\n ");
-    }
+
     // If nothing on the queue, no need to bother hardware
     if (IF_IS_EMPTY(&ifp->if_snd)) {
         return;
@@ -712,7 +707,7 @@ eth_drv_send(struct ifnet *ifp)
                 struct mbuf *m1;
                 for (m1 = m0; m1 ; m1 = m1->m_next) needed++;
                 START_CONSOLE();
-                diag_printf("too many mbufs to tx, %d > %d, need %d\n",
+                diag_printf("too many mbufs to tx, %d > %d, need %d\n", 
                             sg_len, MAX_ETH_DRV_SG, needed );
                 END_CONSOLE();
 #endif
@@ -782,7 +777,7 @@ eth_drv_tx_done(struct eth_drv_sc *sc, CYG_ADDRESS key, int status)
 
     // Guard against a NULL return - can be caused by race conditions in
     // the driver, this is the neatest fixup:
-    if (m0) {
+    if (m0) { 
         mbuf_key = m0;
         m_freem(m0);
     }
@@ -831,7 +826,7 @@ eth_drv_recv(struct eth_drv_sc *sc, int total_len)
 #ifdef CYGPKG_IO_ETH_DRIVERS_WARN_NO_MBUFS
         START_CONSOLE();
         diag_printf("warning: eth_recv out of MBUFs\n");
-#ifdef CYGDBG_NET_SHOW_MBUFS
+#ifdef CYGDBG_NET_SHOW_MBUFS        
         cyg_net_show_mbufs();
 #endif
         END_CONSOLE();
@@ -869,7 +864,7 @@ eth_drv_recv(struct eth_drv_sc *sc, int total_len)
 #ifdef CYGPKG_IO_ETH_DRIVERS_WARN_NO_MBUFS
                 START_CONSOLE();
                 diag_printf("out of MBUFs [2]");
-#ifdef CYGDBG_NET_SHOW_MBUFS
+#ifdef CYGDBG_NET_SHOW_MBUFS                
                 cyg_net_show_mbufs();
 #endif
                 END_CONSOLE();
@@ -890,7 +885,7 @@ eth_drv_recv(struct eth_drv_sc *sc, int total_len)
 #ifdef CYGPKG_IO_ETH_DRIVERS_WARN_NO_MBUFS
                 START_CONSOLE();
                 diag_printf("warning: eth_recv out of MBUFs\n");
-#ifdef CYGDBG_NET_SHOW_MBUFS
+#ifdef CYGDBG_NET_SHOW_MBUFS                
                 cyg_net_show_mbufs();
 #endif
                 END_CONSOLE();
@@ -922,7 +917,7 @@ eth_drv_recv(struct eth_drv_sc *sc, int total_len)
         // fussy if the packet isn't "unloaded", thus we
         // have to wait until now to throw it away
         if (top) {
-        m_free(top);
+	    m_free(top);
         }
         ifp->if_ierrors++;
         return;
@@ -1047,7 +1042,7 @@ void eth_drv_tickle_devices( void )
 
 #ifdef CYGPKG_IO_PCMCIA
 // Lookup a 'netdev' entry, assuming that it is an ethernet device.
-cyg_netdevtab_entry_t *
+cyg_netdevtab_entry_t * 
 eth_drv_netdev(char *name)
 {
     cyg_netdevtab_entry_t *t;

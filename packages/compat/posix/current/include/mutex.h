@@ -71,9 +71,6 @@ externC int pthread_mutexattr_init ( pthread_mutexattr_t *attr);
 // Destroy attribute object
 externC int pthread_mutexattr_destroy ( pthread_mutexattr_t *attr);
 
-// Set type
-externC int pthread_mutexattr_settype ( pthread_mutexattr_t *attr, int type);
-
 #if defined(_POSIX_THREAD_PRIO_INHERIT) || defined(_POSIX_THREAD_PRIO_PROTECT)
 
 // Set priority inversion protection protocol

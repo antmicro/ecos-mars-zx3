@@ -139,45 +139,35 @@ socreate(dom, aso, type, proto, p)
 {
 	register struct protosw *prp;
 	register struct socket *so;
-    register int error;
-    int s = splnet();
+	register int error;
 
-    if (proto) {
-        prp = pffindproto(dom, proto, type);
-    }
-    else {
-        prp = pffindtype(dom, type);
-    }
+	if (proto)
+		prp = pffindproto(dom, proto, type);
+	else
+		prp = pffindtype(dom, type);
 
-    if (prp == 0 || prp->pr_usrreqs->pru_attach == 0) {
-        splx(s);
-        return (EPROTONOSUPPORT);
-    }
+	if (prp == 0 || prp->pr_usrreqs->pru_attach == 0)
+		return (EPROTONOSUPPORT);
 
-    if (prp->pr_type != type) {
-        splx(s);
-        return (EPROTOTYPE);
-    }
-    so = soalloc(p != 0);
-    if (so == 0) {
-        splx(s);
-        return (ENOBUFS);
-    }
+	if (prp->pr_type != type)
+		return (EPROTOTYPE);
+	so = soalloc(p != 0);
+	if (so == 0) {
+		return (ENOBUFS);
+        }
 
-    TAILQ_INIT(&so->so_incomp);
-    TAILQ_INIT(&so->so_comp);
-    so->so_type = type;
-    so->so_proto = prp;
-    error = (*prp->pr_usrreqs->pru_attach)(so, proto, p);
-    if (error) {
-        so->so_state |= SS_NOFDREF;
-        sofree(so);
-        splx(s);
-        return (error);
-    }
-    *aso = so;
-    splx(s);
-    return (0);
+	TAILQ_INIT(&so->so_incomp);
+	TAILQ_INIT(&so->so_comp);
+	so->so_type = type;
+	so->so_proto = prp;
+	error = (*prp->pr_usrreqs->pru_attach)(so, proto, p);
+	if (error) {
+		so->so_state |= SS_NOFDREF;
+		sofree(so);
+		return (error);
+	}
+	*aso = so;
+	return (0);
 }
 
 int

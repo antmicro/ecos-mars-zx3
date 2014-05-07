@@ -452,6 +452,11 @@ typedef cyg_haladdrword CYG_ADDRWORD;
 # define CYGBLD_ATTRIB_STRFTIME_FORMAT(__format__, __args__) \
         __attribute__((format (strftime, __format__, __args__)))
 
+// Tell compiler not to warn us about an unused variable -- generally
+// because it will be used when sources are build under certain
+// circumstances (e.g. with debugging or asserts enabled.
+# define CYGBLD_ATTRIB_UNUSED  __attribute__((unused))
+
 // Tell the compiler not to throw away a variable or function. Only known
 // available on 3.3.2 or above. Old version's didn't throw them away,
 // but using the unused attribute should stop warnings.
@@ -462,7 +467,20 @@ typedef cyg_haladdrword CYG_ADDRWORD;
 #   define CYGBLD_ATTRIB_USED __attribute__((unused))
 #  endif
 # endif 
+
+// Enforce inlining of a C function. GCC does not inline any C
+// function when not optimizing, unless you specify "always_inline" attribute.
+// Other attributes suppress generation of standalone function.
+# if !defined(CYGBLD_FORCE_INLINE)
+#  define CYGBLD_FORCE_INLINE __externC inline __attribute((gnu_inline)) __attribute((always_inline))
+# endif
+
+// Suppress function inlining
+#define CYGBLD_ATTRIB_NO_INLINE __attribute__((noinline))
+
 #else // non-GNU
+
+# define CYGBLD_ATTRIB_UNUSED  /* nothing */
 
 # define CYGBLD_ATTRIB_CONSTRUCTOR
 
@@ -491,6 +509,9 @@ typedef cyg_haladdrword CYG_ADDRWORD;
 
 # define CYGBLD_ATTRIB_STRFTIME_FORMAT(__format__, __args__)
 
+#define CYGBLD_FORCE_INLINE
+
+#define CYGBLD_ATTRIB_NO_INLINE
 
 #endif
 

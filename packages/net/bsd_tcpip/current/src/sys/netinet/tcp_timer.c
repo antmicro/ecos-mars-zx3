@@ -158,8 +158,6 @@ static int	tcp_keepcnt = TCPTV_KEEPCNT;
 int	tcp_maxpersistidle;
 	/* max idle time in persist */
 int	tcp_maxidle;
-/* set if keepalive packet has nonzero length */
-int tcp_keepdata = 0;
 
 /*
  * Tcp protocol timeout routine called every 500 ms.
@@ -307,17 +305,14 @@ tcp_timer_keep(xtp)
 		tcpstat.tcps_keepprobe++;
 		t_template = tcp_maketemplate(tp);
 		if (t_template) {
-            tcp_respond(tp, t_template->tt_ipgen,
-                    &t_template->tt_t, (struct mbuf *)NULL,
-                    tcp_keepdata ? tp->rcv_nxt-1 : tp->rcv_nxt,
-                    tp->snd_una - 1, 0);
-            m_free(dtom(t_template));
-        }
-        callout_reset(tp->tt_keep, tcp_keepintvl, tcp_timer_keep, tp);
-    }
-    else {
-        callout_reset(tp->tt_keep, tcp_keepidle, tcp_timer_keep, tp);
-    }
+			tcp_respond(tp, t_template->tt_ipgen,
+				    &t_template->tt_t, (struct mbuf *)NULL,
+				    tp->rcv_nxt, tp->snd_una - 1, 0);
+			(void) m_free(dtom(t_template));
+		}
+		callout_reset(tp->tt_keep, tcp_keepintvl, tcp_timer_keep, tp);
+	} else
+		callout_reset(tp->tt_keep, tcp_keepidle, tcp_timer_keep, tp);
 
 #ifdef TCPDEBUG
 	if (tp->t_inpcb->inp_socket->so_options & SO_DEBUG)

@@ -395,13 +395,7 @@ _rb_gets_preloaded(char *buf, int buflen, int timeout)
                 return _GETS_TIMEOUT;  // Input timed out
             }
         } else {
-// Exegin changed to make Redboot watchdog aware
-//            mon_read_char(&c);
-            mon_set_read_char_timeout(MIN_TIMEOUT);
-            do {
-                do_idle(false);
-                res = mon_read_char_with_timeout(&c);
-            } while (res == false);
+            mon_read_char(&c);
         }
         *eol = '\0';
 #define CTRL(c) ((c)&0x1F)

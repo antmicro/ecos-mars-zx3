@@ -171,53 +171,22 @@ Cyg_Watchdog::uninstall_action( Cyg_Watchdog_Action *action )
 // -------------------------------------------------------------------------
 // Implementation of the C-api
 
-static Cyg_Watchdog_Action* wdaction;
-#ifndef CYGSEM_WATCHDOG_RESETS_ON_TIMEOUT
-externC void
-watchdog_init(void (*wdtAction)(CYG_ADDRWORD))
-{
-    //static Cyg_Watchdog_Action wdaction(wdtAction, 0);
-    //wdaction.install();
-    wdaction = new Cyg_Watchdog_Action( wdtAction, 0 );
-    //wdaction->install();
-    Cyg_Watchdog::watchdog.install_action( wdaction );
-
-}
-
-externC void
-watchdog_uninstall(void)
-{
-    Cyg_Watchdog::watchdog.uninstall_action( wdaction );
-}
-#else
-
-externC void
-watchdog_init(void (*wdtAction)(CYG_ADDRWORD))
-{
-}
-
-externC void
-watchdog_uninstall(void)
-{
-}
-#endif /* CYGSEM_WATCHDOG_RESETS_ON_TIMEOUT */
-
 externC void
 watchdog_start(void)
 {
-    Cyg_Watchdog::watchdog.start();
+  Cyg_Watchdog::watchdog.start();
 }
 
 externC void
 watchdog_reset(void)
 {
-    Cyg_Watchdog::watchdog.reset();
+  Cyg_Watchdog::watchdog.reset();
 }
 
 externC cyg_uint64
 watchdog_get_resolution(void)
 {
-    return Cyg_Watchdog::watchdog.get_resolution();
+  return Cyg_Watchdog::watchdog.get_resolution();
 }
 
 // -------------------------------------------------------------------------

@@ -134,11 +134,6 @@ __enet_poll(void)
 #endif
 
     while (true) {
-        /* Exegin specific change - make Redboot network package aware of watchdog */
-#if defined(HAL_WATCHDOG_RESET)
-        // Usually defined in var_io.h or plf_io.h
-        HAL_WATCHDOG_RESET;
-#endif
         /*
          * Try to get a free pktbuf and return if none
          * are available.
@@ -224,9 +219,8 @@ __enet_send(pktbuf_t *pkt, enet_addr_t *dest, int eth_type)
     memcpy(&eth_hdr.destination, dest, sizeof(enet_addr_t));
     memcpy(&eth_hdr.source, __local_enet_addr, sizeof(enet_addr_t));
     eth_hdr.type = htons(eth_type);
-    
+
     eth_drv_write((char *)&eth_hdr, (char *)pkt->buf, pkt->pkt_bytes);
-    
 #ifdef ENET_STATS
     ++num_transmitted;
 #endif

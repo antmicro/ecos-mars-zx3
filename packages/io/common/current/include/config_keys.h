@@ -140,6 +140,7 @@
 #define CYG_IO_GET_CONFIG_CAN_TIMEOUT               0x0804
 #define CYG_IO_GET_CONFIG_CAN_HDI                   0x0805
 #define CYG_IO_GET_CONFIG_CAN_STATE                 0x0806
+#define CYG_IO_GET_CONFIG_CAN_ERR_COUNTERS          0x0807
 
 #define CYG_IO_SET_CONFIG_CAN_INFO                  0x0881
 #define CYG_IO_SET_CONFIG_CAN_OUTPUT_DRAIN          0x0882
@@ -150,6 +151,8 @@
 #define CYG_IO_SET_CONFIG_CAN_MODE                  0x0887
 #define CYG_IO_SET_CONFIG_CAN_ABORT                 0x0888
 #define CYG_IO_SET_CONFIG_CAN_CALLBACK              0x0889
+#define CYG_IO_SET_CONFIG_CAN_RANGE_FILTER          0x088A
+#define CYG_IO_SET_CONFIG_CAN_MASK_FILTER           0x088B
 
 // ======== 0x900 ADC ========================================================
 // Get/Set configuration 'key' values for ADC I/O
@@ -159,6 +162,7 @@
 #define CYG_IO_SET_CONFIG_ADC_RATE                  0x0981
 #define CYG_IO_SET_CONFIG_ADC_ENABLE                0x0982
 #define CYG_IO_SET_CONFIG_ADC_DISABLE               0x0983
+#define CYG_IO_SET_CONFIG_ADC_DATA_FLUSH            0x0984
 
 // ======== 0x1000 Generic ===================================================
 // Get/Set configuration 'key' values that can apply to more than one

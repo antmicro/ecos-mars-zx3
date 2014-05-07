@@ -5,46 +5,46 @@
 //      Flash programming
 //
 //==========================================================================
-// ####ECOSGPLCOPYRIGHTBEGIN####
-// -------------------------------------------
-// This file is part of eCos, the Embedded Configurable Operating System.
+// ####ECOSGPLCOPYRIGHTBEGIN####                                            
+// -------------------------------------------                              
+// This file is part of eCos, the Embedded Configurable Operating System.   
 // Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2009 Free Software Foundation, Inc.
 //
-// eCos is free software; you can redistribute it and/or modify it under
-// the terms of the GNU General Public License as published by the Free
-// Software Foundation; either version 2 or (at your option) any later
-// version.
+// eCos is free software; you can redistribute it and/or modify it under    
+// the terms of the GNU General Public License as published by the Free     
+// Software Foundation; either version 2 or (at your option) any later      
+// version.                                                                 
 //
-// eCos is distributed in the hope that it will be useful, but WITHOUT
-// ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-// FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-// for more details.
+// eCos is distributed in the hope that it will be useful, but WITHOUT      
+// ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or    
+// FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License    
+// for more details.                                                        
 //
-// You should have received a copy of the GNU General Public License
-// along with eCos; if not, write to the Free Software Foundation, Inc.,
-// 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+// You should have received a copy of the GNU General Public License        
+// along with eCos; if not, write to the Free Software Foundation, Inc.,    
+// 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.            
 //
-// As a special exception, if other files instantiate templates or use
-// macros or inline functions from this file, or you compile this file
-// and link it with other works to produce a work based on this file,
-// this file does not by itself cause the resulting work to be covered by
-// the GNU General Public License. However the source code for this file
-// must still be made available in accordance with section (3) of the GNU
-// General Public License v2.
+// As a special exception, if other files instantiate templates or use      
+// macros or inline functions from this file, or you compile this file      
+// and link it with other works to produce a work based on this file,       
+// this file does not by itself cause the resulting work to be covered by   
+// the GNU General Public License. However the source code for this file    
+// must still be made available in accordance with section (3) of the GNU   
+// General Public License v2.                                               
 //
-// This exception does not invalidate any other reasons why a work based
-// on this file might be covered by the GNU General Public License.
-// -------------------------------------------
-// ####ECOSGPLCOPYRIGHTEND####
+// This exception does not invalidate any other reasons why a work based    
+// on this file might be covered by the GNU General Public License.         
+// -------------------------------------------                              
+// ####ECOSGPLCOPYRIGHTEND####                                              
 //==========================================================================
 //#####DESCRIPTIONBEGIN####
 //
 // Author(s):    gthomas
 // Contributors: gthomas, Andrew Lunn, Bart Veer
 // Date:         2000-07-26
-// Purpose:
-// Description:
-//
+// Purpose:      
+// Description:  
+//              
 //####DESCRIPTIONEND####
 //
 //==========================================================================
@@ -64,17 +64,6 @@
 #include <cyg/io/flash.h>
 #include <cyg/io/flash_dev.h>
 #include "flash_legacy.h"
-
-/* Exegin specific change to make flash package aware of watchdog */
-#if defined(CYGPKG_IO_WATCHDOG)
-#include <cyg/io/watchdog.h>
-#define FLASH_WATCHDOG_RESET        watchdog_reset()
-#elif defined(HAL_WATCHDOG_RESET)
-// Usually defined in var_io.h or plf_io.h
-#define FLASH_WATCHDOG_RESET        HAL_WATCHDOG_RESET
-#else
-#define FLASH_WATCHDOG_RESET        CYG_EMPTY_STATEMENT
-#endif
 
 // When this flag is set, do not actually jump to the relocated code.
 // This can be used for running the function in place (RAM startup
@@ -159,7 +148,7 @@ find_dev(cyg_flashaddr_t addr, int* stat)
 // linked list, sorted by address. This is the head of the list
 static struct cyg_flash_dev *flash_head = NULL;
 
-static bool flash_sort_and_check(void)
+static bool flash_sort_and_check(void) 
 {
   bool moved;
   struct cyg_flash_dev *dev, **previous_next;
@@ -171,7 +160,7 @@ static bool flash_sort_and_check(void)
       flash_head = dev;
     }
   }
-
+  
   // If there are no valid devices, abort. This might happen if
   // all drivers failed to initialize.
   if (flash_head == NULL) {
@@ -184,19 +173,19 @@ static bool flash_sort_and_check(void)
   // entry on the list.
   do {
     moved=false;
-    for (dev=flash_head, previous_next=&flash_head;
-         dev->next;
+    for (dev=flash_head, previous_next=&flash_head; 
+         dev->next; 
          previous_next = &dev->next, dev=dev->next ){
       if (dev->start > dev->next->start) {
         *previous_next=dev->next;
         dev->next = (*previous_next)->next;
         (*previous_next)->next = dev;
-        moved=true;
+        moved=true;          
         break;
       }
     }
   } while (moved);
-
+  
   // Now walk the linked list and see if there are any overlaps in the
   // addresses the devices claim to use using.
   for (dev=flash_head; dev->next; dev=dev->next){
@@ -230,13 +219,14 @@ find_dev(cyg_flashaddr_t addr, int* stat)
 // initialise we leave dev->init as false. Then sort the devices into
 // ascending order of address and put them into a linked list. Lastly
 // check if we have any overlap of the addresses.
-__externC int
+__externC int 
 cyg_flash_init(cyg_flash_printf *pf)
 {
   int err;
   struct cyg_flash_dev * dev;
-
+  
   CYG_ASSERT(&(cyg_flashdevtab[CYGHWR_IO_FLASH_DEVICE]) == &cyg_flashdevtab_end, "incorrect number of flash devices");
+  
   // In case the printf function has changed.
   if (NULL != pf)
       cyg_flash_set_global_printf(pf);
@@ -247,7 +237,7 @@ cyg_flash_init(cyg_flash_printf *pf)
 
   for (dev = &cyg_flashdevtab[0]; dev != &cyg_flashdevtab_end; dev++) {
     LOCK_INIT(dev);
-
+    
     err = dev->funs->flash_init(dev);
     if (err != CYG_FLASH_ERR_OK) {
       continue;
@@ -255,14 +245,14 @@ cyg_flash_init(cyg_flash_printf *pf)
     CYG_ASSERT(dev->funs, "No flash functions");
     CYG_ASSERT(dev->num_block_infos, "No number of block infos");
     CYG_ASSERT(dev->block_info, "No block infos");
-    CYG_ASSERT(!(((cyg_flashaddr_t)dev->block_info >= dev->start) &&
+    CYG_ASSERT(!(((cyg_flashaddr_t)dev->block_info >= dev->start) && 
                  ((cyg_flashaddr_t)dev->block_info < dev->end)),
                "Block info is in the flash");
     CYG_ASSERT(dev->funs->flash_erase_block, "No erase function");
     CYG_ASSERT(dev->funs->flash_program, "No program function");
 #ifdef CYGDBG_USE_ASSERTS
     {
-         int i;
+         int i; 
          cyg_flashaddr_t addr = dev->start;
          for (i = 0; i < dev->num_block_infos; i++) {
               addr += dev->block_info[i].block_size * dev->block_info[i].blocks;
@@ -272,7 +262,7 @@ cyg_flash_init(cyg_flash_printf *pf)
 #endif
     dev->init = true;
   }
-
+  
 #if (1 == CYGHWR_IO_FLASH_DEVICE)
   // Make sure there is one device, otherwise we could end up
   // accessing a non-existent cyg_flash_dev structure.
@@ -396,7 +386,7 @@ cyg_flash_get_info_addr(const cyg_flashaddr_t flash_base, cyg_flash_info_t * inf
 #ifdef CYGPKG_KERNEL
 // Lock the mutex's for a range of addresses
 __externC int
-cyg_flash_mutex_lock(const cyg_flashaddr_t from, size_t len)
+cyg_flash_mutex_lock(const cyg_flashaddr_t from, size_t len) 
 {
   struct cyg_flash_dev *    dev;
   int                       stat    = CYG_FLASH_ERR_OK;
@@ -417,7 +407,7 @@ cyg_flash_mutex_lock(const cyg_flashaddr_t from, size_t len)
 
 // Unlock the mutex's for a range of addresses
 __externC int
-cyg_flash_mutex_unlock(const cyg_flashaddr_t from, size_t len)
+cyg_flash_mutex_unlock(const cyg_flashaddr_t from, size_t len) 
 {
   struct cyg_flash_dev *    dev;
   int                       stat = CYG_FLASH_ERR_OK;
@@ -441,19 +431,19 @@ cyg_flash_mutex_unlock(const cyg_flashaddr_t from, size_t len)
 #endif
 
 // Return the size of the block which is at the given address
-static size_t
+static size_t 
 flash_block_size(struct cyg_flash_dev *dev, const cyg_flashaddr_t addr)
 {
   int i;
   size_t offset;
-
+  
   CYG_ASSERT((addr >= dev->start) && (addr <= dev->end), "Not inside device");
-
+  
   offset = addr - dev->start;
   for (i=0; i < dev->num_block_infos; i++) {
     if (offset < (dev->block_info[i].blocks * dev->block_info[i].block_size))
       return dev->block_info[i].block_size;
-    offset = offset -
+    offset = offset - 
       (dev->block_info[i].blocks * dev->block_info[i].block_size);
   }
   CYG_FAIL("Programming error");
@@ -462,7 +452,7 @@ flash_block_size(struct cyg_flash_dev *dev, const cyg_flashaddr_t addr)
 
 // Return the size of the block which is at the given address
 __externC size_t
-cyg_flash_block_size(const cyg_flashaddr_t flash_base)
+cyg_flash_block_size(const cyg_flashaddr_t flash_base) 
 {
   struct cyg_flash_dev *    dev;
   int                       stat;
@@ -475,23 +465,23 @@ cyg_flash_block_size(const cyg_flashaddr_t flash_base)
 // Return the first address of a block. The flash might not be aligned
 // in terms of its block size. So we have to be careful and use
 // offsets.
-static inline cyg_flashaddr_t
+static inline cyg_flashaddr_t 
 flash_block_begin(cyg_flashaddr_t addr, struct cyg_flash_dev *dev)
 {
   size_t block_size;
   cyg_flashaddr_t offset;
-
+  
   block_size = flash_block_size(dev, addr);
-
+  
   offset = addr - dev->start;
   offset = (offset / block_size) * block_size;
   return offset + dev->start;
 }
 
 
-__externC int
-cyg_flash_erase(cyg_flashaddr_t flash_base,
-                size_t len,
+__externC int 
+cyg_flash_erase(cyg_flashaddr_t flash_base, 
+                size_t len, 
                 cyg_flashaddr_t *err_address)
 {
   cyg_flashaddr_t block, end_addr;
@@ -504,7 +494,7 @@ cyg_flash_erase(cyg_flashaddr_t flash_base,
   if (!dev) return stat;
 
   CHECK_SOFT_WRITE_PROTECT(flash_base, len);
-
+  
   LOCK(dev);
 
   // Check whether or not we are going past the end of this device, on
@@ -520,7 +510,7 @@ cyg_flash_erase(cyg_flashaddr_t flash_base,
   erase_count   = (end_addr + 1) - block;
 
   CHATTER(dev, "... Erase from %p-%p: ", (void*)block, (void*)end_addr);
-
+  
   HAL_FLASH_CACHES_OFF(d_cache, i_cache);
   FLASH_Enable(flash_base, end_addr);
   while (erase_count > 0) {
@@ -547,7 +537,6 @@ cyg_flash_erase(cyg_flashaddr_t flash_base,
       }
     }
     if (!erased) {
-      FLASH_WATCHDOG_RESET;
       stat = dev->funs->flash_erase_block(dev,block);
     }
     if (CYG_FLASH_ERR_OK != stat) {
@@ -572,17 +561,17 @@ cyg_flash_erase(cyg_flashaddr_t flash_base,
   // The stack overheads should be minimal because the number of
   // devices will be small.
   if (len > (dev->end + 1 - flash_base)) {
-    return cyg_flash_erase(dev->end+1,
+    return cyg_flash_erase(dev->end+1, 
                            len - (dev->end + 1 - flash_base),
                            err_address);
   }
   return CYG_FLASH_ERR_OK;
 }
 
-__externC int
-cyg_flash_program(cyg_flashaddr_t flash_base,
-                  const void *ram_base,
-                  size_t len,
+__externC int 
+cyg_flash_program(cyg_flashaddr_t flash_base, 
+                  const void *ram_base, 
+                  size_t len, 
                   cyg_flashaddr_t *err_address)
 {
   struct cyg_flash_dev * dev;
@@ -596,7 +585,7 @@ cyg_flash_program(cyg_flashaddr_t flash_base,
   if (!dev) return stat;
 
   CHECK_SOFT_WRITE_PROTECT(flash_base, len);
-
+  
   LOCK(dev);
   addr = flash_base;
   if (len > (dev->end + 1 - flash_base)) {
@@ -614,9 +603,9 @@ cyg_flash_program(cyg_flashaddr_t flash_base,
   } else {
       offset = addr - block;
   }
-
+  
   CHATTER(dev, "... Program from %p-%p to %p: ", ram_base, ((CYG_ADDRESS)ram_base)+write_count, addr);
-
+  
   HAL_FLASH_CACHES_OFF(d_cache, i_cache);
   FLASH_Enable(flash_base, end_addr);
   while (write_count > 0) {
@@ -629,12 +618,11 @@ cyg_flash_program(cyg_flashaddr_t flash_base,
     }
     // Only the first block may need the offset.
     offset       = 0;
-
-    FLASH_WATCHDOG_RESET;
+    
     stat = dev->funs->flash_program(dev, addr, ram, this_write);
 #ifdef CYGSEM_IO_FLASH_VERIFY_PROGRAM
     if (CYG_FLASH_ERR_OK == stat) // Claims to be OK
-      if (!dev->funs->flash_read && memcmp((void *)addr, ram, this_write) != 0) {
+      if (!dev->funs->flash_read && memcmp((void *)addr, ram, this_write) != 0) {                
         stat = CYG_FLASH_ERR_DRV_VERIFY;
         CHATTER(dev, "V");
       }
@@ -657,18 +645,17 @@ cyg_flash_program(cyg_flashaddr_t flash_base,
     return (stat);
   }
   if (len > (dev->end + 1 - flash_base)) {
-    FLASH_WATCHDOG_RESET;
-    return cyg_flash_program(dev->end+1, ram,
+    return cyg_flash_program(dev->end+1, ram, 
                              len - (dev->end + 1 - flash_base),
                              err_address);
   }
   return CYG_FLASH_ERR_OK;
 }
 
-__externC int
-cyg_flash_read(const cyg_flashaddr_t flash_base,
-               void *ram_base,
-               size_t len,
+__externC int 
+cyg_flash_read(const cyg_flashaddr_t flash_base, 
+               void *ram_base, 
+               size_t len, 
                cyg_flashaddr_t *err_address)
 {
   struct cyg_flash_dev * dev;
@@ -727,8 +714,7 @@ cyg_flash_read(const cyg_flashaddr_t flash_base,
           }
           // Only the first block may need the offset
           offset      = 0;
-
-          FLASH_WATCHDOG_RESET;
+    
           stat = dev->funs->flash_read(dev, addr, ram, this_read);
           if (CYG_FLASH_ERR_OK != stat && err_address) {
               *err_address = addr;
@@ -741,7 +727,7 @@ cyg_flash_read(const cyg_flashaddr_t flash_base,
       }
       FLASH_Disable(flash_base, end_addr);
       HAL_FLASH_CACHES_ON(d_cache, i_cache);
-#endif
+#endif      
   }
   //  CHATTER(dev, "\n");
   UNLOCK(dev);
@@ -749,7 +735,6 @@ cyg_flash_read(const cyg_flashaddr_t flash_base,
     return (stat);
   }
   if (len > (dev->end + 1 - flash_base)) {
-      FLASH_WATCHDOG_RESET;
       return cyg_flash_read(dev->end+1, ram,
                             len - (dev->end + 1 - flash_base),
                             err_address);
@@ -758,9 +743,9 @@ cyg_flash_read(const cyg_flashaddr_t flash_base,
 }
 
 #ifdef CYGHWR_IO_FLASH_BLOCK_LOCKING
-__externC int
-cyg_flash_lock(const cyg_flashaddr_t flash_base,
-               size_t len,
+__externC int 
+cyg_flash_lock(const cyg_flashaddr_t flash_base, 
+               size_t len, 
                cyg_flashaddr_t *err_address)
 {
   cyg_flashaddr_t block, end_addr;
@@ -774,7 +759,7 @@ cyg_flash_lock(const cyg_flashaddr_t flash_base,
   if (!dev->funs->flash_block_lock) return CYG_FLASH_ERR_INVALID;
 
   CHECK_SOFT_WRITE_PROTECT(flash_base, len);
-
+  
   LOCK(dev);
   if (len > (dev->end + 1 - flash_base)) {
       end_addr = dev->end;
@@ -783,9 +768,9 @@ cyg_flash_lock(const cyg_flashaddr_t flash_base,
   }
   block         = flash_block_begin(flash_base, dev);
   lock_count    = (end_addr + 1) - block;
-
+  
   CHATTER(dev, "... Locking from %p-%p: ", (void*)block, (void*)end_addr);
-
+  
   HAL_FLASH_CACHES_OFF(d_cache, i_cache);
   FLASH_Enable(flash_base, end_addr);
   while (lock_count > 0) {
@@ -794,7 +779,7 @@ cyg_flash_lock(const cyg_flashaddr_t flash_base,
         lock_count = block_size;
     }
     stat = dev->funs->flash_block_lock(dev,block);
-
+    
     if (CYG_FLASH_ERR_OK != stat && err_address) {
       *err_address = block;
       break;
@@ -813,7 +798,7 @@ cyg_flash_lock(const cyg_flashaddr_t flash_base,
 
   // Recurse if necessary for the next device
   if (len > (dev->end + 1 - flash_base)) {
-    return cyg_flash_lock(dev->end+1,
+    return cyg_flash_lock(dev->end+1, 
                           len - (dev->end + 1 - flash_base),
                           err_address);
   }
@@ -821,9 +806,9 @@ cyg_flash_lock(const cyg_flashaddr_t flash_base,
   return CYG_FLASH_ERR_OK;
 }
 
-__externC int
-cyg_flash_unlock(const cyg_flashaddr_t flash_base,
-                 size_t len,
+__externC int 
+cyg_flash_unlock(const cyg_flashaddr_t flash_base, 
+                 size_t len, 
                  cyg_flashaddr_t *err_address)
 {
   cyg_flashaddr_t block, end_addr;
@@ -837,7 +822,7 @@ cyg_flash_unlock(const cyg_flashaddr_t flash_base,
   if (!dev->funs->flash_block_unlock) return CYG_FLASH_ERR_INVALID;
 
   CHECK_SOFT_WRITE_PROTECT(flash_base, len);
-
+  
   LOCK(dev);
   if (len > (dev->end + 1 - flash_base)) {
       end_addr = dev->end;
@@ -846,9 +831,9 @@ cyg_flash_unlock(const cyg_flashaddr_t flash_base,
   }
   block         = flash_block_begin(flash_base, dev);
   unlock_count  = (end_addr + 1) - block;
-
+  
   CHATTER(dev, "... Unlocking from %p-%p: ", (void*)block, (void*)end_addr);
-
+  
   HAL_FLASH_CACHES_OFF(d_cache, i_cache);
   FLASH_Enable(flash_base, end_addr);
   while (unlock_count > 0) {
@@ -857,14 +842,14 @@ cyg_flash_unlock(const cyg_flashaddr_t flash_base,
         unlock_count = block_size;
     }
     stat = dev->funs->flash_block_unlock(dev,block);
-
+    
     if (CYG_FLASH_ERR_OK != stat && err_address) {
       *err_address = block;
       break;
     }
     block           += block_size;
     unlock_count    -= block_size;
-
+    
     CHATTER(dev, ".");
   }
   FLASH_Disable(flash_base, end_addr);
@@ -874,10 +859,10 @@ cyg_flash_unlock(const cyg_flashaddr_t flash_base,
   if (stat != CYG_FLASH_ERR_OK) {
     return stat;
   }
-
+  
   // Recurse if necessary for the next device
   if (len > (dev->end + 1 - flash_base)) {
-    return cyg_flash_lock(dev->end+1,
+    return cyg_flash_lock(dev->end+1, 
                           len - (dev->end + 1 - flash_base),
                           err_address);
   }

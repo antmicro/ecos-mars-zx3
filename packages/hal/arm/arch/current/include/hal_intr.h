@@ -62,6 +62,8 @@
 
 #include <cyg/infra/cyg_type.h>
 
+#include <cyg/hal/hal_arch.h>
+
 // This is to allow a variant to decide that there is no platform-specific
 // interrupts file; and that in turn can be overridden by a platform that
 // refines the variant's ideas.
@@ -151,51 +153,58 @@ externC cyg_uint32 hal_default_isr(CYG_ADDRWORD vector, CYG_ADDRWORD data);
 typedef cyg_uint32 CYG_INTERRUPT_STATE;
 
 //--------------------------------------------------------------------------
+// Interrupt disable mask
+//
+// This is used to control which of IRQ and FIQ is enabled/disabled by
+// the HAL interrupt control macros, and other places in the HAL. 
+
+#ifdef CYGOPT_HAL_ARM_FIQ_DISABLE
+#define CPSR_INTR_MASK          (CPSR_IRQ_DISABLE|CPSR_FIQ_DISABLE)
+#else
+#define CPSR_INTR_MASK          (CPSR_IRQ_DISABLE)
+#endif
+
+//--------------------------------------------------------------------------
 // Interrupt control macros
 
 #ifndef __thumb__
-// Note: This disables both FIQ and IRQ interrupts!
 #define HAL_DISABLE_INTERRUPTS(_old_)           \
     asm volatile (                              \
         "mrs %0,cpsr;"                          \
-        "mrs r4,cpsr;"                          \
-        "orr r4,r4,#0xC0;"                      \
+        "orr r4,%0,%1;"                         \
         "msr cpsr,r4"                           \
         : "=r"(_old_)                           \
-        :                                       \
+        : "i"(CPSR_INTR_MASK)                   \
         : "r4"                                  \
         );
 
 #define HAL_ENABLE_INTERRUPTS()                 \
     asm volatile (                              \
         "mrs r3,cpsr;"                          \
-        "bic r3,r3,#0xC0;"                      \
+        "bic r3,r3,%0;"                         \
         "msr cpsr,r3"                           \
         :                                       \
-        :                                       \
+        : "i"(CPSR_INTR_MASK)                   \
         : "r3"                                  \
         );
 
 #define HAL_RESTORE_INTERRUPTS(_old_)           \
     asm volatile (                              \
         "mrs r3,cpsr;"                          \
-        "and r4,%0,#0xC0;"                      \
-        "bic r3,r3,#0xC0;"                      \
+        "and r4,%0,%1;"                         \
+        "bic r3,r3,%1;"                         \
         "orr r3,r3,r4;"                         \
         "msr cpsr,r3"                           \
         :                                       \
-        : "r"(_old_)                            \
+        : "r"(_old_),"i"(CPSR_INTR_MASK)        \
         : "r3", "r4"                            \
         );
 
 #define HAL_QUERY_INTERRUPTS(_old_)             \
     asm volatile (                              \
-        "mrs r4,cpsr;"                          \
-        "and r4,r4,#0xC0;"                      \
-        "eor %0,r4,#0xC0;"                      \
+        "mrs %0,cpsr;"                          \
         : "=r"(_old_)                           \
-        :                                       \
-        : "r4"                                  \
+        : "i"(CPSR_INTR_MASK)                   \
         );
 #else // __thumb__
 
@@ -299,6 +308,26 @@ externC cyg_uint32 hal_query_interrupts(void);
 #endif // __thumb__
 
 //--------------------------------------------------------------------------
+// FIQ interrupt control
+//
+// If eCos is not masking FIQs then the user can enable/disable them
+// independently.
+
+#ifndef CYGOPT_HAL_ARM_FIQ_DISABLE
+
+externC cyg_uint32 hal_disable_FIQ(void);
+externC void       hal_enable_FIQ(void);
+externC void       hal_restore_FIQ(cyg_uint32);
+externC cyg_uint32 hal_query_FIQ(void);
+
+#define HAL_DISABLE_FIQ(_old_) _old_ = hal_disable_FIQ()
+#define HAL_ENABLE_FIQ() hal_enable_FIQ()
+#define HAL_RESTORE_FIQ(_old_) hal_restore_FIQ(_old_)
+#define HAL_QUERY_FIQ(_old_) _old_ = hal_query_FIQ()
+
+#endif
+
+//--------------------------------------------------------------------------
 // Routine to execute DSRs using separate interrupt stack
 
 #ifdef  CYGIMP_HAL_COMMON_INTERRUPTS_USE_INTERRUPT_STACK
@@ -376,9 +405,6 @@ externC void hal_interrupt_mask(int);
 externC void hal_interrupt_unmask(int);
 externC void hal_interrupt_acknowledge(int);
 externC void hal_interrupt_configure(int, int, int);
-#ifdef  CYGIMP_HAL_INTERRUPTS_THROTTLING_SUPPORT
-externC void hal_interrupt_configure_throttling( int, unsigned int );
-#endif
 externC void hal_interrupt_set_level(int, int);
 
 #define HAL_INTERRUPT_MASK( _vector_ )                     \
@@ -389,12 +415,6 @@ externC void hal_interrupt_set_level(int, int);
     hal_interrupt_acknowledge( _vector_ )
 #define HAL_INTERRUPT_CONFIGURE( _vector_, _level_, _up_ ) \
     hal_interrupt_configure( _vector_, _level_, _up_ )
-#ifdef  CYGIMP_HAL_INTERRUPTS_THROTTLING_SUPPORT
-#define HAL_INTERRUPT_CONFIGURE_THROTTLING( _vector_, _delay_ ) \
-    hal_interrupt_configure_throttling( _vector_, _delay_ )
-#else
-#define HAL_INTERRUPT_CONFIGURE_THROTTLING( _vector_, _delay_ )
-#endif
 #define HAL_INTERRUPT_SET_LEVEL( _vector_, _level_ )       \
     hal_interrupt_set_level( _vector_, _level_ )
 

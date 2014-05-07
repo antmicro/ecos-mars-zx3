@@ -1,3 +1,86 @@
+2014-02-13  Ilija Kocho  <ilijak@siva.com.mk>
+
+	* cortexm/kinetis/var/current/include/var_intr.h:
+	Add interrupt numbers for second eDMA controller.
+
+	* cortexm/kinetis/var/current/include/var_io_clkgat.h:
+	Add clock gating for ADC2
+
+	* cortexm/kinetis/var/current/include/var_io_gpio.h:
+	Add GPIO port F.
+
+2013-04-28  Ilija Kocho  <ilijak@siva.com.mk>
+
+	* include/var_intr.h : Redefine CYGNUM_HAL_INTERRUPT_RTC_RTC because of
+	conflict with same named macro defined in hal_intr.h (Cortex-M architecture).
+	Define some interrrupt numbers, previously reservrd.
+	* include/var_io.h : Upgrade RTC registers. [ Bugzilla 1001904 ]
+
+2013-06-12 Mike Jones <mike@proclivis.com>
+
+	* include/var_io_gpio.h
+	Clean up macros to support interrupts and set/get features.
+	
+2013-04-28  Ilija Kocho  <ilijak@siva.com.mk>
+
+	* cdl/hal_cortexm_kinetis.cdl: 
+	* cdl/kinetis_ddram.cdl: (New file)
+	* cdl/kinetis_fbram.cdl: (New file)
+	Add FlexBus RAM configuration and caching, DDRAM CDL moved
+	to a separate file. Updated FlexNVM configuration with 512KiB FlexNVM
+	and 16KiB FlexMemory.
+	* cdl/kinetis_clocking.cdl: CYGINT_HAL_CORTEXM_KINETIS_150
+	moved to hal_cortexm_kinetis.cdl
+	* include/var_io_lmem.h, include/hal_cache.h: Add more cache functions.
+	[ Bugzilla 1001837 ]
+	
+2013-04-09  Tomas Frydrych <tomas@sleepfive.com>
+
+	* cdl/kinetis_irq_scheme.cdl:
+	* include/var_io_devs.h:
+	Implemented support for I2C  [Bugzilla 1001397]
+
+2013-04-01  Ilija Kocho  <ilijak@siva.com.mk>
+
+	* include/var_io.h, include/var_io_clkgat.h, include/var_io_devs.h,
+	* src/hal_diag.c, src/kinetis_ddram.c, src/kinetis_misc.c
+	Add clock gating management and API. [ Bugzilla 1001814 ]
+
+2012-11-06  Ilija Kocho  <ilijak@siva.com.mk>
+
+	* cdl/hal_cortexm_kinetis.cdl: Changes to Kinetis part builder related to
+	addition of archhitectural hardware floating point support.
+	CYGHWR_HAL_CORTEXM_KINETIS_FPU and CYGHWR_HAL_CORTEXM_KINETIS_FLEXNVM
+	look and feel like other name building options. Added new Kinetis
+	members to part selection.
+	* include/var_io.h, src/kinetis_misc.c: Enumerated PORT F.
+	[Bugzilla 1001607]
+
+2012-11-04  Ilija Kocho  <ilijak@siva.com.mk>
+
+	* include/var_io.h: Define register access to FTFL module. 
+	Contributed by Nicolas Aujoux at 2012-09-07 [Bugzilla 1001561]
+
+2012-09-28  Ilija Kocho  <ilijak@siva.com.mk>
+
+	* var/current/cdl/hal_cortexm_kinetis.cdl
+	* var/current/cdl/kinetis_clocking.cdl
+	* var/current/doc/kinetis.sgml
+	* var/current/include/hal_cache.h
+	* var/current/include/var_io_ddrmc.h
+	* var/current/include/var_io_lmem.h
+	* var/current/src/kinetis_ddram.c
+	* var/current/src/kinetis_misc.c:
+	Separate data and code caches, as well as text indentation suggested by Jifl.
+	Fixes to cache and SDRAM CDL and functions Improved SDRAM controller
+	support due to better manufacturer documentation: Configurable pad control.
+	                                           [Bugzilla 1001606]
+
+2012-08-01  Ilija Kocho  <ilijak@siva.com.mk>
+
+	* include/var_io.h, src/kinetis_misc.c: Add functions and macros
+	for clock gating control to Kinetis.       [Bugzilla 1001642]
+
 2012-05-18  Ilija Kocho  <ilijak@siva.com.mk>
 
 	* include/hal_cache.h, src/kinetis_misc.c: Provide for cache

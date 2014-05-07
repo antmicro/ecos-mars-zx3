@@ -1,3 +1,18 @@
+2012-03-04  Sergei Gavrikov  <sergei.gavrikov@gmail.com>
+
+	* tests/fnmatch.c: Add missed CYG_TEST_INIT().
+
+2011-05-23  Manuel Borchers  <manuel@matronix.de>
+
+	* src/dir.cxx (rewinddir): Fix tracing of rewinddir().
+	* src/fio.h: Add new function entry macro (FILEIO_ENTRY_VOID).
+	[ Bugzilla 1001243 ]
+
+2010-02-08  Jay Foster <jay@systech.com>
+
+	* tests/pselect.c: Corrected return value of pthread_kill()
+	to match POSIX standard.
+
 2008-11-18  Rutger Hofman <rutger@cs.vu.nl>
 
 	* src/file.cxx: add a chmod() call, implemented by calling

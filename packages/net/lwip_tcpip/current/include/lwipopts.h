@@ -4,7 +4,7 @@
 //####ECOSGPLCOPYRIGHTBEGIN####
 // -------------------------------------------
 // This file is part of eCos, the Embedded Configurable Operating System.
-// Copyright (C) 2008, 2009 Free Software Foundation
+// Copyright (C) 2008, 2009, 2010, 2011 Free Software Foundation
 //
 // eCos is free software; you can redistribute it and/or modify it under
 // the terms of the GNU General Public License as published by the Free
@@ -36,12 +36,26 @@
 
 #include <cyg/hal/hal_arch.h>
 
+#if defined(CYGIMP_LWIP_ENDIAN_BY_HAL) && CYGIMP_LWIP_ENDIAN_BY_HAL
+# include <cyg/hal/hal_endian.h>
+#endif
+
 //------------------------------------------------------------------------------
 // Platform specific locking
 //------------------------------------------------------------------------------
 
 #define SYS_LIGHTWEIGHT_PROT        1
 #define NO_SYS                      defined(CYGFUN_LWIP_MODE_SIMPLE)
+
+//------------------------------------------------------------------------------
+// Architecture specific options
+//------------------------------------------------------------------------------
+
+#if defined(CYGIMP_LWIP_ENDIAN_BY_HAL) && CYGIMP_LWIP_ENDIAN_BY_HAL
+# define LWIP_PLATFORM_BYTESWAP     1
+# define LWIP_PLATFORM_HTONS(__val) CYG_CPU_TO_BE16(__val)
+# define LWIP_PLATFORM_HTONL(__val) CYG_CPU_TO_BE32(__val)
+#endif
 
 //------------------------------------------------------------------------------
 // Memory options
@@ -51,6 +65,14 @@
 #define MEMP_MEM_MALLOC             defined(CYGIMP_LWIP_MEMP_MEM_MALLOC)
 #define MEM_ALIGNMENT               CYGNUM_LWIP_MEM_ALIGNMENT
 #define MEM_SIZE                    CYGNUM_LWIP_MEM_SIZE
+
+#if defined(CYGSEM_LWIP_MEM_SECTION) && CYGSEM_LWIP_MEM_SECTION
+# include <cyg/infra/cyg_type.h>
+# define MEM_SECTION CYGBLD_ATTRIB_SECTION(CYGDAT_LWIP_MEM_SECTION_NAME)
+#else
+# define MEM_SECTION
+#endif
+
 #define MEMP_OVERFLOW_CHECK         defined(CYGDBG_LWIP_MEMP_OVERFLOW_CHECK)
 #define MEMP_SANITY_CHECK           defined(CYGDBG_LWIP_MEMP_SANITY_CHECK)
 
@@ -99,7 +121,9 @@
 // IP options
 //------------------------------------------------------------------------------
 
-#define IP_FORWARD                  defined(CYGFUN_LWIP_IP_FORWARD)
+#ifdef CYGFUN_LWIP_IP_FORWARD
+# define IP_FORWARD                 1
+#endif
 #define IP_OPTIONS_ALLOWED          defined(CYGFUN_LWIP_IP_OPTIONS_ALLOWED)
 #define IP_REASSEMBLY               defined(CYGFUN_LWIP_IP_REASSEMBLY)
 #define IP_FRAG                     defined(CYGFUN_LWIP_IP_FRAG)
@@ -251,7 +275,7 @@
 #define LWIP_NETIF_LINK_CALLBACK    defined(CYGFUN_LWIP_NETIF_LINK_CALLBACK)
 #define LWIP_NETIF_HWADDRHINT       defined(CYGIMP_LWIP_NETIF_HWADDRHINT)
 #define LWIP_NETIF_LOOPBACK         defined(CYGIMP_LWIP_NETIF_LOOPBACK)
-#define LWIP_LOOPBACK_MAX_PBUFS     CYGIMP_LWIP_NETIF_LOOPBACK_MAX_PBUFS
+#define LWIP_LOOPBACK_MAX_PBUFS     CYGNUM_LWIP_NETIF_LOOPBACK_MAX_PBUFS
 //#define LWIP_NETIF_LOOPBACK_MULTITHREADING // not configurable
 //#define LWIP_NETIF_TX_SINGLE_PBUF // not configurable
 

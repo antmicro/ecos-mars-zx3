@@ -274,8 +274,8 @@ show_bootp(const char *intf, struct bootp *bp)
     diag_printf("        hlen: %d\n", bp->bp_hlen );
     diag_printf("        hops: %d\n", bp->bp_hops );
     diag_printf("         xid: 0x%x\n", bp->bp_xid );
-    diag_printf("        secs: %d\n", bp->bp_secs );
-    diag_printf("       flags: 0x%x\n", bp->bp_flags );
+    diag_printf("        secs: %d\n", ntohs(bp->bp_secs) );
+    diag_printf("       flags: 0x%x\n", ntohs(bp->bp_flags) );
     diag_printf("       hw_addr: ");
     for (i = 0;  i < bp->bp_hlen;  i++) {
         diag_printf("%02x", bp->bp_chaddr[i]);
@@ -449,7 +449,7 @@ init_net(const char *intf, struct bootp *bp)
     int s=-1;
     int one = 1;
     struct ecos_rtentry route;
-    struct in_addr netmask, gateway;
+    struct in_addr gateway;
     unsigned int length;
     int retcode = false;
     
@@ -481,7 +481,6 @@ init_net(const char *intf, struct bootp *bp)
 
     length = sizeof(addrp->sin_addr);
     if (get_bootp_option(bp, TAG_SUBNET_MASK, &addrp->sin_addr,&length)) {
-        netmask = addrp->sin_addr;
         if (ioctl(s, SIOCSIFNETMASK, &ifr)) {
             perror("SIOCSIFNETMASK");
             goto out;

@@ -220,15 +220,9 @@ eth_drv_buffers_init(void)
 static void
 eth_drv_init(struct eth_drv_sc *sc, unsigned char *enaddr)
 {
-	int i;
     // enaddr == 0 -> hardware init was incomplete (no ESA)
     if (enaddr != 0) {
         // Set up hardware address
-	//XXX: (kgug) hack memcpy fails
-	//for(i=0;i<ETHER_ADDR_LEN;i++)
-	//{
-	//	sc->sc_arpcom.esa[i] = enaddr[i];
-	//}
         memcpy(&sc->sc_arpcom.esa, enaddr, ETHER_ADDR_LEN);
         __local_enet_sc = sc;
         eth_drv_start(sc);
@@ -290,9 +284,7 @@ eth_drv_write(char *eth_hdr, char *buf, int len)
 
     while (!(sc->funs->can_send)(sc)) {
         // Give driver a chance to service hardware
-
         (sc->funs->poll)(sc);
-
         CYGACC_CALL_IF_DELAY_US(2*100000);
         if (--wait_time <= 0)
             goto reset_and_out;  // Give up on sending packet
@@ -338,7 +330,6 @@ eth_drv_write(char *eth_hdr, char *buf, int len)
             sc->funs->eth_drv_old = (struct eth_drv_funs *)0;
         }
     }
-
 }
 
 //
@@ -351,9 +342,6 @@ eth_drv_tx_done(struct eth_drv_sc *sc, CYG_ADDRWORD key, int status)
     CYGARC_HAL_SAVE_GP();
     if ((int *)key == &packet_sent) {
         *(int *)key = 1;
-#ifdef CYGDBG_IO_ETH_DRIVERS_DEBUG
-	diag_printf("%s: packet transmitted \n", __func__);
-#endif
     } else {
         // It's possible that this acknowledgement is for a different
         // [logical] driver.  Try and pass it on.
@@ -367,7 +355,6 @@ eth_drv_tx_done(struct eth_drv_sc *sc, CYG_ADDRWORD key, int status)
             end_console(old_console);
         }
 #endif
-	diag_printf("%s: passing packet to different driver \n", __func__);
         LOCK_APPLICATION_SCHEDULER();
         if (sc->funs->eth_drv_old) {
             (sc->funs->eth_drv_old->tx_done)(sc, key, status);
@@ -424,6 +411,10 @@ eth_drv_read(char *eth_hdr, char *buf, int len)
             sc->funs->eth_drv = sc->funs->eth_drv_old;
             sc->funs->eth_drv_old = (struct eth_drv_funs *)0;
         }
+//        if (!old_state & ETH_DRV_STATE_ACTIVE) {
+//            // This interface was not fully initialized, shut it back down
+//            (sc->funs->stop)(sc);
+//        }
     }
     return res;
 }

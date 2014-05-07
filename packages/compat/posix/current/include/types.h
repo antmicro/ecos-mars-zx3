@@ -106,10 +106,6 @@ typedef struct pthread_attr_t
 #define PTHREAD_INHERIT_SCHED           1
 #define PTHREAD_EXPLICIT_SCHED          2
 
-/* Process shared or private flag.  */
-#define PTHREAD_PROCESS_PRIVATE         1
-#define PTHREAD_PROCESS_SHARED          2
-
 //-----------------------------------------------------------------------------
 #endif // ifndef CYGONCE_POSIX_TYPES_H
 // End of types.h

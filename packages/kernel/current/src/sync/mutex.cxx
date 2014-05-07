@@ -92,8 +92,6 @@ Cyg_Mutex::Cyg_Mutex()
         
     locked      = false;
     owner       = NULL;
-    type        = NORMAL;
-    nest        = 0;
 
 #if defined(CYGSEM_KERNEL_SYNCH_MUTEX_PRIORITY_INVERSION_PROTOCOL_DEFAULT) && \
     defined(CYGSEM_KERNEL_SYNCH_MUTEX_PRIORITY_INVERSION_PROTOCOL_DYNAMIC)
@@ -142,8 +140,6 @@ Cyg_Mutex::Cyg_Mutex( cyg_protcol protocol_arg )
         
     locked      = false;
     owner       = NULL;
-    type        = NORMAL;
-    nest        = 0;
 
     protocol    = protocol_arg;
 
@@ -249,15 +245,8 @@ Cyg_Mutex::lock(void)
                
     while( locked && result )
     {
-        if ((type == RECURSIVE) && (self == owner )) {
-            nest++;
-            Cyg_Scheduler::unlock();
-            return result;
-        }
-        else {
-            CYG_ASSERT( self != owner, "Locking mutex I already own");
-        }
-
+        CYG_ASSERT( self != owner, "Locking mutex I already own");
+        
         self->set_sleep_reason( Cyg_Thread::WAIT );
         
         self->sleep();
@@ -299,7 +288,6 @@ Cyg_Mutex::lock(void)
     {
         locked      = true;
         owner       = self;
-        nest        = 0;
 
         CYG_INSTRUMENT_MUTEX(LOCKED, this, 0);
     }
@@ -342,9 +330,7 @@ cyg_bool
 Cyg_Mutex::trylock(void)
 {
     CYG_REPORT_FUNCTYPE("returning %d");
-
-    Cyg_Thread *self = Cyg_Thread::self();
-
+        
     CYG_ASSERTCLASS( this, "Bad this pointer");
     
     cyg_bool result = true;
@@ -356,9 +342,10 @@ Cyg_Mutex::trylock(void)
     // for ourself. Otherwise return failure.
     if( !locked )
     {
+        Cyg_Thread *self = Cyg_Thread::self();
+        
         locked  = true;
         owner   = self;
-        nest    = 0;
 
 #ifdef CYGSEM_KERNEL_SYNCH_MUTEX_PRIORITY_INVERSION_PROTOCOL
 
@@ -374,12 +361,7 @@ Cyg_Mutex::trylock(void)
 #endif        
         
     }
-    else if ((type == RECURSIVE) && (self == owner )) {
-        nest++;
-    }
-    else {
-        result = false;
-    }
+    else result = false;
 
     CYG_INSTRUMENT_MUTEX(TRY, this, result);
     
@@ -406,13 +388,7 @@ Cyg_Mutex::unlock(void)
     CYG_ASSERTCLASS( this, "Bad this pointer");
     CYG_ASSERT( locked, "Unlock mutex that is not locked");
     CYG_ASSERT( owner == Cyg_Thread::self(), "Unlock mutex I do not own");
-
-    if ((type == RECURSIVE) && (nest > 0)) {
-        nest--;
-        Cyg_Scheduler::unlock();
-        return;
-    }
-
+        
     if( !queue.empty() ) {
 
         // The queue is non-empty, so grab the next
@@ -553,23 +529,6 @@ void Cyg_Mutex::set_protocol( cyg_protcol new_protocol )
 
 #endif
 
-// -------------------------------------------------------------------------
-// Set type (e.g. recursive)
-
-void Cyg_Mutex::set_type( cyg_type new_type )
-{
-    CYG_REPORT_FUNCTION();
-
-    // Prevent preemption
-    Cyg_Scheduler::lock();
-
-    type = new_type;
-
-    // Unlock the scheduler
-    Cyg_Scheduler::unlock();
-
-    CYG_REPORT_RETURN();
-}
 
 //==========================================================================
 // Condition variables

@@ -46,13 +46,10 @@
 //####DESCRIPTIONEND####
 //
 //=============================================================================
+
 #include <cyg/io/spi.h>
 #include <cyg/io/flash.h>
 #include <cyg/io/flash_dev.h>
-
-//TODO added it here but this should reside in the platform hal
-#include <cyg/hal/hal_if.h>
-#include <cyg/infra/diag.h>
 
 #include <cyg/infra/cyg_type.h>
 #include <cyg/infra/cyg_ass.h>
@@ -100,13 +97,10 @@ typedef enum m25pxx_cmd {
   M25PXX_CMD_WDRI  = 0x04,  // Write disable.
   M25PXX_CMD_RDID  = 0x9F,  // Read identification.
   M25PXX_CMD_RDSR  = 0x05,  // Read status register.
-  M25PXX_CMD_RDSR2 = 0x35,  // Read status register 2 (Winbond W25QXX flash). 
   M25PXX_CMD_WRSR  = 0x01,  // Write status register.
   M25PXX_CMD_READ  = 0x03,  // Read data.
   M25PXX_CMD_FREAD = 0x0B,  // Read data (fast transaction).
-  M25PXX_CMD_QFREAD= 0x6B,  // Read data (quad fast transaction).
   M25PXX_CMD_PP    = 0x02,  // Page program.
-  M25PXX_CMD_QPP   = 0x32,  // Page program (quad transaction).
   M25PXX_CMD_SE    = 0xD8,  // Sector erase.
   M25PXX_CMD_BE    = 0xC7,  // Bulk erase.
   M25PXX_CMD_RES   = 0xAB,  // Read electronic signature.
@@ -180,11 +174,6 @@ static const m25pxx_params m25pxx_supported_devices [] = {
     sector_count : 2,
     jedec_id     : 0x00202010
   },
-  { // Support for Winbond W25Q128
-    sector_size  : 256,
-    sector_count : 256,
-    jedec_id     : 0x00EF4018
-  },
   { // Null terminating entry.
     sector_size  : 0,
     sector_count : 0,
@@ -253,17 +242,6 @@ static inline void m25pxx_spi_wren
 }
 
 //-----------------------------------------------------------------------------
-// Send write enable command.
-
-static inline void m25pxx_spi_wren_poll
-  (struct cyg_flash_dev *dev)
-{
-  cyg_spi_device* spi_device = (cyg_spi_device*) dev->priv;
-  const cyg_uint8 tx_buf [1] = { M25PXX_CMD_WREN };
-  cyg_spi_transfer (spi_device, true, 1, tx_buf, NULL);
-}
-
-//-----------------------------------------------------------------------------
 // Send sector erase command.  The address parameter is a device local address 
 // within the sector to be erased.
 
@@ -273,7 +251,7 @@ static inline void m25pxx_spi_se
   cyg_spi_device* spi_device = (cyg_spi_device*) dev->priv;
   const cyg_uint8 tx_buf [4] = { M25PXX_CMD_SE,
     (cyg_uint8) (addr >> 16), (cyg_uint8) (addr >> 8), (cyg_uint8) (addr) };
-  cyg_spi_transfer (spi_device, M25PXX_POLLED, 4, tx_buf, NULL); 
+  cyg_spi_transfer (spi_device, M25PXX_POLLED, 4, tx_buf, NULL);
 }
 
 //-----------------------------------------------------------------------------
@@ -284,37 +262,6 @@ static inline cyg_uint8 m25pxx_spi_rdsr
 {
   cyg_spi_device* spi_device = (cyg_spi_device*) dev->priv;
   const cyg_uint8 tx_buf [2] = { M25PXX_CMD_RDSR, 0 };
-  cyg_uint8 rx_buf [2];
-
-  // Carry out SPI transfer and return the status byte.
-  //XXX: hack (when working with interrupts this function hangs)
-  cyg_spi_transfer (spi_device, true/*M25PXX_POLLED*/, 2, tx_buf, rx_buf); 
-  return rx_buf [1];
-}
-
-//-----------------------------------------------------------------------------
-// Read and return the 8-bit device status register (poll).
-
-static inline cyg_uint8 m25pxx_spi_rdsr_poll
-  (struct cyg_flash_dev *dev)
-{
-  cyg_spi_device* spi_device = (cyg_spi_device*) dev->priv;
-  const cyg_uint8 tx_buf [2] = { M25PXX_CMD_RDSR, 0 };
-  cyg_uint8 rx_buf [2];
-
-  // Carry out SPI transfer and return the status byte.
-  cyg_spi_transfer (spi_device, true, 2, tx_buf, rx_buf);
-  return rx_buf [1];
-}
-
-//-----------------------------------------------------------------------------
-// Read and return the 8-bit device status register 2.
-
-static inline cyg_uint8 m25pxx_spi_rdsr2
-  (struct cyg_flash_dev *dev)
-{
-  cyg_spi_device* spi_device = (cyg_spi_device*) dev->priv;
-  const cyg_uint8 tx_buf [2] = { M25PXX_CMD_RDSR2, 0 };
   cyg_uint8 rx_buf [2];
 
   // Carry out SPI transfer and return the status byte.
@@ -339,23 +286,6 @@ static inline void m25pxx_spi_pp
   cyg_spi_transaction_end (spi_device);
 }
 
-static inline void m25pxx_spi_qpp
-  (struct cyg_flash_dev *dev, cyg_flashaddr_t addr, cyg_uint8* wbuf, cyg_uint32 wbuf_len)
-{
-  cyg_spi_device* spi_device = (cyg_spi_device*) dev->priv;
-  const cyg_uint8 tx_buf [4] = { M25PXX_CMD_QPP,
-    (cyg_uint8) (addr >> 16), (cyg_uint8) (addr >> 8), (cyg_uint8) (addr) };
-
-  // Implement the program operation as a multistage SPI transaction.
-  cyg_spi_transaction_begin (spi_device);
-  cyg_spi_transaction_transfer (spi_device, M25PXX_POLLED, 4, tx_buf, NULL, false);
-  cyg_spi_transaction_transfer (spi_device, M25PXX_POLLED, wbuf_len, wbuf, NULL, false);
-  cyg_spi_transaction_end (spi_device);
-}
-
-
-/****************************************************************************/
-
 //-----------------------------------------------------------------------------
 // Implement fast reads to the specified buffer.
 
@@ -373,51 +303,11 @@ static inline void m25pxx_spi_fread
   cyg_spi_transaction_end (spi_device);
 }
 
-
-static inline void m25pxx_spi_qfread
-  (struct cyg_flash_dev *dev, cyg_flashaddr_t addr, cyg_uint8* rbuf, cyg_uint32 rbuf_len)
-{
-  cyg_spi_device* spi_device = (cyg_spi_device*) dev->priv;
-  const cyg_uint8 tx_buf [5] = { M25PXX_CMD_QFREAD,
-    (cyg_uint8) (addr >> 16), (cyg_uint8) (addr >> 8), (cyg_uint8) (addr), 0 };
-
-  // Implement the read operation as a multistage SPI transaction.
-  cyg_spi_transaction_begin (spi_device);
-  cyg_spi_transaction_transfer (spi_device, M25PXX_POLLED, 4, tx_buf, NULL, false);
-  cyg_spi_transaction_transfer (spi_device, M25PXX_POLLED, 1, &tx_buf[4], NULL, false);
-  cyg_spi_transaction_transfer (spi_device, M25PXX_POLLED, rbuf_len, rbuf, rbuf, false); //dummy bytes 
-  cyg_spi_transaction_end (spi_device);
-}
-
 //=============================================================================
 // Standard Flash device API.  All the following functions assume that a valid
 // SPI device handle is passed in the 'priv' reference of the flash device
 // data structure.
 //=============================================================================
-
-//TODO added writing to SR
-static inline void m25pxx_spi_write_sr_poll
- (struct cyg_flash_dev* dev, cyg_uint8* value_v)
-{
-
-  cyg_spi_device* spi_device = (cyg_spi_device*) dev->priv;
-  const cyg_uint8 tx_buf [3] = { M25PXX_CMD_WRSR, (cyg_uint8) (value_v[0]), (cyg_uint8) (value_v[1]) } ;
-  cyg_uint8 dev_status;
-
-  // Implement the write operation.
-  cyg_spi_transfer (spi_device, true, 3, tx_buf, NULL);
-
-  dev_status = m25pxx_spi_rdsr_poll (dev); // Dummy read
-
-  // Spin waiting for the erase to complete.  This can take between 1 and 3
-  // seconds, so we use a polling interval of 1/2 sec.
-
-  do {
-    M25PXX_DELAY_MS (500);
-    dev_status = m25pxx_spi_rdsr_poll (dev);
-  } while (dev_status & M25PXX_STATUS_WIP);
-
-}
 
 //-----------------------------------------------------------------------------
 // Initialise the SPI flash, reading back the flash parameters.
@@ -455,12 +345,6 @@ static int m25pxx_init
       retval = FLASH_ERR_OK;
     }
   }
- 
-  m25pxx_spi_wren_poll(dev);
-  cyg_uint8 regs[2] = { 0,2 };
- 
-  m25pxx_spi_write_sr_poll(dev,regs);
- 
   return retval;
 }
 
@@ -504,16 +388,8 @@ static int m25pxx_program
   cyg_uint32 tx_bytes;
   cyg_uint8  dev_status;
 
-
   // Fix up the block address.
   if (!m25pxx_to_local_addr (dev, &local_base)) {
-    retval = FLASH_ERR_INVALID;
-    goto out;
-  }
-   
-  //TODO: add some ifdef  
-  //address must be aligned to 4 
-  if(local_base % 4){
     retval = FLASH_ERR_INVALID;
     goto out;
   }
@@ -526,7 +402,7 @@ static int m25pxx_program
   // Perform page program operations.
   while (tx_bytes_left) {
     m25pxx_spi_wren (dev);
-    m25pxx_spi_qpp (dev, local_base, tx_ptr, tx_bytes);
+    m25pxx_spi_pp (dev, local_base, tx_ptr, tx_bytes);
 
     // Spin waiting for write to complete.  This can take up to 5ms, so
     // we use a polling interval of 1ms - which may get rounded up to the
@@ -567,14 +443,13 @@ static int m25pxx_read
   if (m25pxx_to_local_addr (dev, &local_base)) {
     while (rx_bytes_left) {
       rx_bytes = (rx_bytes_left < rx_block_size) ? rx_bytes_left : rx_block_size;
-      m25pxx_spi_qfread (dev, local_base, rx_ptr, rx_bytes); //TODO changed to new read function, also changed to quad read
+      m25pxx_spi_fread (dev, local_base, rx_ptr, rx_bytes);
 
       // Update counters and data pointers for next read block.
       rx_bytes_left -= rx_bytes;
       rx_ptr += rx_bytes;
       local_base += rx_bytes; 
     }
-
     retval = FLASH_ERR_OK;
   }
   return retval;

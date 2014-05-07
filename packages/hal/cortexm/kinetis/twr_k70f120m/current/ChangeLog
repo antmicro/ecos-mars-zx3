@@ -1,3 +1,57 @@
+2013-04-09  Ilija Kocho <ilijak@siva.com.mk>
+
+	* cdl/hal_cortexm_kinetis_twr_k70f120m.cdl:
+
+	Add requirement for WRITETHRU data cache startup mode when eDMA is in use.
+	Sync with change in eDMA driver [ Bugzilla 1001838 ]
+
+2013-04-09  Ilija Kocho <ilijak@siva.com.mk>
+
+	* cdl/hal_cortexm_kinetis_twr_k70f120m.cdl:
+	* include/plf_io.h:
+	Implemented support for I2C  [Bugzilla 1001397]
+
+2013-04-01  Ilija Kocho  <ilijak@siva.com.mk>
+
+	* src/twr_k70f120m_misc.c: Clock gating synchronised with variant.
+	[ Bugzilla 1001814 ]
+
+2013-03-09  Ilija Kocho  <ilijak@siva.com.mk>
+
+	* misc/redboot_K70_ROM_FPU.ecm: Add ECM file
+
+2012-11-30  Ilija Kocho  <ilijak@siva.com.mk>
+
+	* cdl/hal_cortexm_kinetis_twr_k70f120m.cdl: Sync with variant changes due to
+	hardware floating point support. Implements CYGINT_HAL_FPV4_SP_D16.
+	Changed maximum peripheral bus clocks to 75MHz.
+	[Bugzilla 1001607]
+
+2012-11-04  Ilija Kocho  <ilijak@siva.com.mk>
+
+	* include/pkgconf/mlt_kinetis_flash_sram2s_extram_ram.ldi
+	* include/pkgconf/mlt_kinetis_flash_unisram_extram_ram.ldi:
+	Recognize 256 Bytes space for virtual vectors in sram.
+
+	* twr_k70f120m/current/cdl/hal_cortexm_kinetis_twr_k70f120m.cdl:
+	Add settings for Kinetis internal flash.  [Bugzilla 1001561]
+
+2012-09-28  Ilija Kocho  <ilijak@siva.com.mk>
+
+	* cdl/hal_cortexm_kinetis_twr_k70f120m.cdl
+	* include/pkgconf/mlt_kinetis_flash_sram2s_extram_ram.h
+	* include/pkgconf/mlt_kinetis_flash_sram2s_extram_ram.ldi
+	* include/pkgconf/mlt_kinetis_flash_sram2s_extram_rom.h
+	* current/include/pkgconf/mlt_kinetis_flash_sram2s_extram_rom.ldi
+	* current/include/pkgconf/mlt_kinetis_flash_unisram_extram_ram.h
+	* current/include/pkgconf/mlt_kinetis_flash_unisram_extram_ram.ldi
+	* include/pkgconf/mlt_kinetis_flash_unisram_extram_rom.h
+	* include/pkgconf/mlt_kinetis_flash_unisram_extram_rom.ldi
+	* src/twr_k70f120m_misc.c:
+	Synchronized with Kinetis variant changes to SDRAM controller support.
+	Memory layouts adapted to separate data and code cacing partitions.
+	                                            [Bugzilla 1001606]
+
 2012-05-19  John Dallaway  <john@dallaway.org.uk>
 
 	* cdl/hal_cortexm_kinetis_twr_k70f120m.cdl: Reference per-package

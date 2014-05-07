@@ -169,6 +169,11 @@
 #define CYGHWR_IO_FREESCALE_SPI1_PIN_CS4  CYGHWR_HAL_KINETIS_PIN_NONE
 #define CYGHWR_IO_FREESCALE_SPI1_PIN_CS5  CYGHWR_HAL_KINETIS_PIN_NONE
 
+// I2C
+// I2C Pins
+
+# define CYGHWR_IO_I2C_FREESCALE_I2C0_PIN_SDA CYGHWR_HAL_KINETIS_PIN(D, 9, 2, 0)
+# define CYGHWR_IO_I2C_FREESCALE_I2C0_PIN_SCL CYGHWR_HAL_KINETIS_PIN(D, 8, 2, 0)
 
 //=============================================================================
 // Memory access checks.
@@ -177,7 +182,7 @@
 // the CPU to hang. These macros allow the GDB stubs to avoid making
 // accidental accesses to these areas.
 
-__externC int cyg_hal_stub_permit_data_access( CYG_ADDRESS addr, cyg_uint32 count );
+__externC int cyg_hal_stub_permit_data_access( void* addr, cyg_uint32 count );
 
 #define CYG_HAL_STUB_PERMIT_DATA_READ(_addr_, _count_) cyg_hal_stub_permit_data_access( _addr_, _count_ )
 

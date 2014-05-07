@@ -8,7 +8,7 @@
 ## ####ECOSGPLCOPYRIGHTBEGIN####                                            
 ## -------------------------------------------                              
 ## This file is part of eCos, the Embedded Configurable Operating System.   
-## Copyright (C) 1998, 1999, 2000, 2001, 2002 Free Software Foundation, Inc.
+## Copyright (C) 1998, 1999, 2000, 2001, 2002, 2014 Free Software Foundation, Inc.
 ##
 ## eCos is free software; you can redistribute it and/or modify it under    
 ## the terms of the GNU General Public License as published by the Free     
@@ -41,7 +41,7 @@
 #
 # Author(s):      bartv
 # Original data:  gthomas
-# Contributors:
+# Contributors:   jld
 # Date:           1999-06-13
 #
 #####DESCRIPTIONEND####
@@ -58,6 +58,8 @@ cdl_package CYGPKG_HAL_ARM {
         support for this processor architecture. It is also
         necessary to select a specific target platform HAL
         package."
+
+    implements    CYGINT_PROFILE_HAL_MCOUNT
 
     compile       hal_misc.c context.S arm_stub.c hal_syscall.c
 
@@ -206,13 +208,13 @@ cdl_package CYGPKG_HAL_ARM {
         legal_values  { (CYGINT_HAL_ARM_ARCH_ARM7 != 0) ? "ARM7" : ""
                         (CYGINT_HAL_ARM_ARCH_ARM9 != 0) ? "ARM9" : ""
                         (CYGINT_HAL_ARM_ARCH_STRONGARM != 0) ? "StrongARM" : ""
-                        (CYGINT_HAL_ARM_ARCH_ARM_CORTEXA9 != 0) ? "ARM Cortex-A9 MP" : ""
+			(CYGINT_HAL_ARM_ARCH_ARM_CORTEXA9 != 0) ? "ARM Cortex-A9 MP" : ""
                         (CYGINT_HAL_ARM_ARCH_XSCALE != 0) ? "XScale" : ""
                         "" }
         default_value  { (CYGINT_HAL_ARM_ARCH_ARM7 != 0) ? "ARM7" : 
                          (CYGINT_HAL_ARM_ARCH_ARM9 != 0) ? "ARM9" : 
-                         (CYGINT_HAL_ARM_ARCH_STRONGARM != 0) ? "StrongARM" : 
-                         (CYGINT_HAL_ARM_ARCH_ARM_CORTEXA9 != 0) ? "ARM Cortex-A9 MP" :
+                         (CYGINT_HAL_ARM_ARCH_STRONGARM != 0) ? "StrongARM" :
+			 (CYGINT_HAL_ARM_ARCH_ARM_CORTEXA9 != 0) ? "ARM Cortex-A9 MP" :	
                          (CYGINT_HAL_ARM_ARCH_XSCALE != 0) ? "XScale" :
                          "unknown" }
         no_define
@@ -246,15 +248,6 @@ cdl_package CYGPKG_HAL_ARM {
             raw exception frame dump and register contents."
     }
 
-    cdl_option CYGARC_HAL_DETECT_JUMP_TO_ZERO {
-        display          "Call the exception handler after jumps to zero"
-        requires         !CYG_HAL_STARTUP_ROM && !CYG_HAL_STARTUP_ROMRAM
-        default_value    0
-        description      "
-            Calls the exception handler with a 'software interrupt' after
-            a jump to zero is detected. Enable this only, when the
-            platform does not support the warm reset feature"
-    }
     cdl_option CYGIMP_HAL_PROCESS_ALL_EXCEPTIONS {
         display          "Process all exceptions with the eCos application"
         default_value    0
@@ -307,6 +300,33 @@ cdl_package CYGPKG_HAL_ARM {
             handlers."
     }
 
+    cdl_option CYGOPT_HAL_ARM_FIQ_DISABLE {
+        display          "Disable FIQs"
+        default_value    1
+        description      "This option causes the HAL to disable both IRQ and FIQ
+                          interrupts during critical sections. Disabling this option
+                          causes eCos to only disable IRQs and puts FIQ
+                          interrupts outside the eCos world where they cannot interact
+                          with eCos in any way. Disabling this option also enables
+                          a set of macros, HAL_DISABLE|ENABLE|RESTORE|QUERY_FIQ,
+                          that provide control over the delivery of FIQs.
+                          The default is for this option to be enabled, which provides
+                          backward compatibility with previous versions of the ARM HAL."
+    }
+
+    cdl_option CYGNUM_HAL_ARM_FIQ_STACK_SIZE {
+        display          "FIQ stack size"
+        active_if        !CYGOPT_HAL_ARM_FIQ_DISABLE
+        flavor           data
+        legal_values     32 to 0x80000000
+        default_value    512
+        description      "This option set the size of the stack used to handle FIQ
+                          interrupts. It is only used if the HAL is not disabling
+                          FIQs during critical sections. Otherwise FIQs are translated
+                          into IRQs and delivered on the standard interrupt stack."
+    }
+    
+    
     cdl_component CYGPKG_REDBOOT_ARM_OPTIONS {
         display       "Redboot for ARM options"
         flavor        none
@@ -368,6 +388,19 @@ cdl_package CYGPKG_HAL_ARM {
             }
         }
 
+    }
+
+    cdl_option CYGBLD_HAL_ARM_MCOUNT {
+        display           "Support call-graph profiling"
+        flavor            bool
+        no_define
+        active_if         CYGPKG_PROFILE_GPROF
+        calculated        CYGPKG_PROFILE_CALLGRAPH
+        requires          { CYGHWR_THUMB implies CYGBLD_ARM_ENABLE_THUMB_INTERWORK }
+        compile           mcount.S
+        description       "
+            Calculate whether mcount functions should be built
+            to support call-graph profiling."
     }
 
     cdl_option CYGBLD_LINKER_SCRIPT {

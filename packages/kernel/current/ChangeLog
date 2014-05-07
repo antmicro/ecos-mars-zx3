@@ -1,3 +1,77 @@
+2014-03-13  Ilija Kocho  <ilijak@siva.com.mk>
+
+	* tests/tm_basic.c: Increase resolution of time measurement for platforms
+	featuring HAL_CLOCK_READ_NS. [Bugzilla 1001958]
+
+2013-06-13  Ilija Kocho  <ilijak@siva.com.mk>
+
+	* tests/kintr0.c, tests/kcache1.c: Fix compiler warnings.
+
+2013-04-26  Ilija Kocho  <ilijak@siva.com.mk>
+
+	* tests/fpint_thread_switch.c: Fix missing semicolon.
+	Bug spotted and patch provided by John Dallaway. [ Bugzilla 1001835 ]
+
+2013-02-10  Ilija Kocho  <ilijak@siva.com.mk>
+            Jonathan Larmour  <jifl@eCosCentric.com>
+
+	* cdl/kernel.cdl:
+	* tests/fpinttestf.c, tests/fpinttestf1.c, tests/fpinttestf2.c,
+	* tests/fpint_thread_switch.c: Add single precision floating point tests.
+	[ Bugzilla 1001607 ]
+
+2012-10-04  Ilija Kocho <ilijak@siva.com.mk>
+
+	* tests/kcache2.c: Include CYGHWR_MEMORY_LAYOUT_H in order to
+	effectively test memory size. Bug reported and fix suggested by
+	Bernd Edlinger.                              [Bugzilla 1001650]
+
+2012-05-27  Ilija Kocho <ilijak@siva.com.mk>
+
+	* tests/kcache2.c: Allow comilation for targets with less then
+	128KiB RAM by conditionally reducing of MAXSIZE to (1<<16)
+
+
+2012-03-19  Sergei Gavrikov  <sergei.gavrikov@gmail.com>
+            Jonathan Larmour  <jifl@eCosCentric.com>
+
+	* tests/except1.cxx (cause_exception): Fix compiler warning about
+	variable that is set but not used. Enter CYGBLD_ATTRIB_UNUSED.
+	* tests/kexcept1.c (cause_exception): Ditto.
+	* tests/kmbox1.c (entry1): Fix compiler warning about variable that
+	is set but not used. Use by a conditional CYGMTH_MBOX_PUT_CAN_WAIT.
+	* tests/mbox1.cxx (entry1): Ditto.
+	* tests/tm_basic.cxx (run_thread_tests, run_mbox_tests,
+	run_flag_tests): Remove unused variables.
+
+2012-03-06  Grant Edwards <grant.b.edwards@gmail.com>
+	
+	* src/intr/intr.cxx (attach): Fix compiler warning about unused
+	variable. [ Bugzilla 1001505 ]
+
+2011-07-09  Ilija Kocho  <ilijak@siva.com.mk>
+
+	* tests/bin_sem2.cxx (PHILOSOPHERS):
+	* tests/fptest.cx (TEST_NA):
+	* tests/kmutex3.c (NTHREADS):
+	* tests/kmutex4.c (NTHREADS):
+	* tests/mutex3.cxx (NTHREADS):
+	* tests/thread_gdb.c (NTHREADS):
+	* tests/timeslice.c (NTHREADS_MAX):
+	* tests/timeslice2.c (NTHREADS_MAX):
+	* tests/tm_basic.cxx (NTEST_THREADS): Given a chance to compile and
+	run more tests for low memory footprint targets. [ Bugzilla 1001253 ]
+
+2010-11-22  Andrew Lunn  <andrew.lunn@ascom.ch>
+
+	* tests/intr0.cxx (intr0_main): Fix a compiler warning by changing
+	a CHECK() statement.
+
+2010-03-29  Lars Povlsen  <lpovlsen@vitesse.com>
+
+	* src/common/thread.cxx: Add volatile to idle_thread_loops for use with
+	cpuload package and GCC 4.
+
 2010-02-25  John Dallaway  <john@dallaway.org.uk>
 
 	* doc/kernel.sgml: Indicate that cyg_alarm_initialize() takes an

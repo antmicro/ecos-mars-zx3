@@ -517,8 +517,6 @@ struct cyg_mutex_t
     cyg_atomic          locked;         /* true if locked               */
     cyg_thread          *owner;         /* Current locking thread       */
     cyg_threadqueue     queue;          /* Queue of waiting threads     */
-    cyg_mutex_type_t    type;           /* Mutex type (e.g. recursive)  */
-    cyg_uint32          nest;           /* Recursive nest count         */
 
 #ifdef CYGSEM_KERNEL_SYNCH_MUTEX_PRIORITY_INVERSION_PROTOCOL_DYNAMIC
     cyg_mutex_protocol_t protocol;       /* this mutex's protocol        */

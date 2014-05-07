@@ -1,3 +1,40 @@
+2013-09-11  Uwe Kindler  <uwe_kindler@web.de>
+
+	* ecos.db: Add CAN driver entry for olcpl2294 target (Olimex
+	LPC-L2294-1M development board).
+
+2013-07-01  Mike Jones <mjones@proclivis.com.>
+
+	* ecos.db: Add TWR-K60F120M platform HAL package and target
+	records.
+
+2013-06-12  John Dallaway  <john@dallaway.org.uk>
+
+	* ecos.db: Add STM32F4-Discovery platform HAL package and target
+	records.
+
+2013-05-2013  Uwe Kindler  <uwe_kindler@web.de>
+
+	* ecos.db: Add CAN driver entry for olcpe2294 target (Olimex
+	LPC-E2294 development board).
+
+2013-04-26  Tomas Frydrych <tomas@sleepfive.com>
+2013-04-26  Mike Jones <mike@proclivis.com>
+
+	* ecos.db: Add Freescale I2C driver and I2C driver entries for
+	Kinetis targets.
+
+2013-04-14  Jerzy Dyrda  <jerzdy@gmail.com>
+
+	* ecos.db: Add STM32 Erhernet driver and Ethernet  driver entries
+	to STM3220G-eval and STM3240G-eval boards.
+
+2012-11-04  Ilija Kocho  <ilijak@siva.com.mk>
+
+	* ecos.db: Add Kinetis internal flash driver contributed by
+	Nicolas Aujoux. Added flash driver entries
+	to: TWR-K60N512, TWR-K40X256, TWR-K70F120M and Kwikstik.
+
 2012-02-22  Ilija Kocho  <ilijak@siva.com.mk>
 
 	* ecos.db: Add TWR-K70F120M bsp and target.
@@ -9,7 +46,7 @@
 
 2012-03-30  Jonathan Larmour  <jifl@eCosCentric.com>
 
-	* NEWS, ecos.db: Add STM3220G-eval and STM3240G-eval board port and
+	* NEWS, ecos.db: Add  STM3220G-eval and STM3240G-evalW board port and
 	targets. Contributed by eCosCentric Limited.
 
 2012-03-30  John Dallaway  <john@dallaway.org.uk>

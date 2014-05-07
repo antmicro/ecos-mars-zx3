@@ -1,3 +1,100 @@
+2012-03-13  Grant Edwards <grant.b.edwards@gmail.com>
+
+	* src/ecos/support.c (_dumpentry, show_network_tables): Fix
+	compiler warnings by removing variables that are set but never
+	referenced. [ Bugzilla 1001516 ]
+
+2012-03-08  Grant Edwards <grant.b.edwards@gmail.com>
+
+	* doc/freebsd.sgml: Add section on how to disable ipv6 support at
+	runtime. [ Bugzilla 1001502 ]
+
+2012-03-08  Grant Edwards <grant.b.edwards@gmail.com>
+
+	* src/sys/netinet6/icmp6.c (icmp6_redirect_input):
+	* src/sys/netinet6/in6_src.c (in6_selectroute):
+	* src/sys/netinet6/ip6_mroute.c (phyint_send, pim6_input):
+	* src/sys/netinet6/nd6.c (nd6_timer, nd6_dad_ns_input):
+	* src/sys/netinet6/nd6_rtr.c (prelist_update):
+	* src/sys/netinet6/ip6_output.c (ip6_ctloutput, ip6_raw_ctloutput):
+	* src/sys/netinet6/raw_ip6.c (rip6_ctlinput):
+	* src/sys/netinet6/ip6_input.c (ip6_hopopts_input): Fix compiler
+	warnings by removing variables that are set but never referenced,
+	or by declaring them as "unused" if they are referenced only by
+	conditionally-compiled code.
+	* src/sys/netinet6/raw_ip6.c (rip6_ctlinput):
+	* src/sys/netinet6/in6_ifattach.c (get_rand_ifid,in6_nigroup):
+	* src/sys/netinet6/ip6_output.c (ip6_insert_jumboopt):
+	* src/sys/netinet6/ip6_input.c (ip6_get_prevhdr): Fix compiler
+	warnings about signed/unsigned char mismatches.
+	* src/sys/netinet6/ip6_input.c (ip6_savecontrol): Fix
+	grouping/precedence/paren error in flag checking expression --
+	verified same fix is already in upstream.
+	[ Bugzilla 1001526 ]
+
+2012-03-08  Grant Edwards <grant.b.edwards@gmail.com>
+
+	* src/sys/net/if_ethersubr.c (ether_output, ether_resolvemulti):
+	Fix compiler warning by removing variable that was set but never
+	referenced.  Fix compiler warning about signed/unsigned pointer
+	mismatch.
+	* src/sys/netinet/tcp_input.c (tcp_input):
+	* src/sys/netinet/tcp_output.c (tcp_output):
+	* src/sys/netinet/ip_encap.c (encap6_ctlinput):
+	* src/sys/netinet/udp_usrreq.c (udp_output, udp_connect): Fix
+	compiler warnings about variables that are set but not referenced.
+	Some are removed, others that are referenced in
+	conditionally-compiled code are marked with the "unused"
+	attribute.
+	[ Bugzilla 1001525 ]
+
+2012-03-06  Grant Edwards <grant.b.edwards@gmail.com>
+	
+	* cdl/freebsd_net.cdl:
+	* src/sys/netinet/in_pcb.c: Add CDL option
+	CYGOPT_NET_FREEBSD_FORCE_DIRECTED_BROADCAST that allows you to
+	control whether or not packets sent to 255.255.255.255 get
+	redirected to the interface's subnet broadcast address.  By
+	default, this option is enabled (behavior is the same as
+	before this change). [ Bugzilla 1001508 ]
+	
+2012-03-06  Grant Edwards <grant.b.edwards@gmail.com>
+	
+	* include/sys/param.h:
+	* src/sys/netinet6/ip6_input.c:  Make ip6_init2() visible globally
+	as cyg_ip6_init2() so that it's possible to disable ipv6 support
+	at runtime by munging the net init table and replacing calls to
+	net_add_domain(&inet6domain) and ip6_init2() with calls to a noop
+	function. [ Bugzilla 1001502 ]
+
+2012-02-29  Grant Edwards <grant.b.edwards@gmail.com>
+
+	* cdl/freebsd_net.cdl:  Add -fno-strict-aliasing compiler flag to fix
+	compiler warnings from newer versions (4.6) of gcc. [ bugzilla 1001501 ]
+
+2011-05-12  John Dallaway  <john@dallaway.org.uk>
+
+	* include/sys/param.h: Fix cyg_arc4random() extern. Issue reported by
+	Marwijn Hessel. [ Bugzilla 1001227 ]
+
+2011-02-22  Kelvin Lawson  <kelvinl@users.sf.net>
+
+	* src/sys/netinet/if_ether.c: Merge fix from FreeBSD CVS r1.108.
+	Prevents creation of reciprocal ARP cache entries for hosts not on
+	local subnet.
+	* cdl/freebsd_net.cdl:
+	* include/netinet/tcp_var.c:
+	* src/sys/netinet/tcp_subr.c:
+	* src/sys/netinet/tcp_input.c: Merge fix from FreeBSD CVS. Introduces
+	a maximum size for the TCP reassembly queue to limit network buffer
+	usage associated with reassembly. Enable CYGNUM_NET_TCP_REASS_DIVISOR
+	and set it to configure the maximum number of buffers usable for TCP
+	reassembly.
+
+2010-09-18  John Dallaway  <john@dallaway.org.uk>
+
+	* doc/freebsd.sgml: No longer "recent".
+
 2009-07-22  John Dallaway  <john@dallaway.org.uk>
 
 	* include/sys/cdefs.h: Silence undefined macro warning reported
@@ -629,7 +726,7 @@
 # ####GPLCOPYRIGHTBEGIN####                                       
 # -------------------------------------------                     
 # This file is part of eCos, the Embedded Configurable Operating System.
-# Copyright (C) 2000, 2001, 2002 Free Software Foundation, Inc.   
+# Copyright (C) 2000, 2001, 2002, 2010, 2011 Free Software Foundation, Inc.   
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by

@@ -186,9 +186,9 @@ _name_:
 //
 
 #ifndef CYGHWR_HAL_VECTOR_TABLE_BASE
-//TUPN.DEL # define CYGHWR_HAL_VECTOR_TABLE_BASE     0
-# define CYGHWR_HAL_VECTOR_TABLE_BASE     0
+# define CYGHWR_HAL_VECTOR_TABLE_BASE     0x0
 #endif  /* ifdef CYGHWR_HAL_VECTOR_TABLE_BASE */
+
         .code   32
         .section ".vectors","ax"
 
@@ -215,14 +215,11 @@ __exception_handlers:
         ldr     pc,.abort_data                  // 0x10
 #ifdef CYGNUM_HAL_ARM_VECTOR_0x14
         .word   CYGNUM_HAL_ARM_VECTOR_0x14
-#elif defined CYGARC_HAL_DETECT_JUMP_TO_ZERO
-        ldr     pc,.jump_to_zero                // unused by ARM, misused for call of zero detection
 #else
         .word   0                               // unused
 #endif
         ldr     pc,.IRQ                         // 0x18
         ldr     pc,.FIQ                         // 0x1C
-
 
 // The layout of these pointers should match the vector table above since
 // they are copied in pairs.
@@ -233,11 +230,7 @@ PTR(undefined_instruction)                      // 0x24
 PTR(software_interrupt)                         // 0x28
 PTR(abort_prefetch)                             // 0x2C
 PTR(abort_data)                                 // 0x30
-#ifdef CYGARC_HAL_DETECT_JUMP_TO_ZERO
-PTR(jump_to_zero)                               // 0x34, unused by ARM, patched for call of zero detection
-#else
         .word   0                               // 0x34
-#endif
 PTR(IRQ)                                        // 0x38
 PTR(FIQ)                                        // 0x3c
 #ifdef CYGSEM_HAL_ARM_PID_ANGEL_BOOT         
@@ -294,11 +287,6 @@ ice_thread_vector:
 #endif
                         
         .text   
-
-#ifdef CYGPKG_HAL_ARM_ARM9_AT91RM9200
-        .section ".cachelock","ax",%progbits
-#endif
-
 // Startup code which will get the machine into supervisor mode
         .global reset_vector
         .type   reset_vector,function
@@ -321,11 +309,7 @@ warm_reset:
         // We cannot access any LED registers until after PLATFORM_SETUP1
         LED 7
 
-        // move vectors
-        mrc     p15,0,r0,c1,c0,0   // read control register
-        tst     r0,#0x2000         // test the V-Bit: location of exception vectors
-        moveq   r0,#0              // 0: exception table at 0
-        ldrne   r0,=0xFFFF0000     // 1: exception table at 0xFFFF0000
+        mov     r0,#0           // move vectors
         ldr     r1,=__exception_handlers
 #ifndef CYGDBG_HAL_DEBUG_GDB_INCLUDE_STUBS
         // Wait with this if stubs are included (see further down).
@@ -371,12 +355,12 @@ start:
 #if defined(CYG_HAL_STARTUP_RAM) && \
     !defined(CYGDBG_HAL_DEBUG_GDB_INCLUDE_STUBS)
 // If we get restarted, hang here to avoid corrupting memory
-        ldr     r2,.init_flag
-        ldr     r3,[r2]
-1:      cmp     r3,#0
+        ldr     r0,.init_flag
+        ldr     r1,[r0]
+1:      cmp     r1,#0
         bne     1b
-        ldr     r3,init_done
-        str     r3,[r2]
+        ldr     r1,init_done
+        str     r1,[r0]
 #endif
 
         // Reset software interrupt pointer
@@ -384,8 +368,6 @@ start:
         ldr     r1,.__exception_handlers
 #if defined(CYG_HAL_STARTUP_RAM) && \
     !defined(CYGDBG_HAL_DEBUG_GDB_INCLUDE_STUBS)
-        ldr     r0,=CYGHWR_HAL_VECTOR_TABLE_BASE
-        ldr     r1,.__exception_handlers
         cmp     r7,#CPSR_SUPERVISOR_MODE
         beq     10f
 #endif
@@ -408,12 +390,6 @@ start:
         str     r2,[r0,#HAL_ARM_ABORT_VECTOR]
         ldr     r2,[r1,#HAL_ARM_ABORT_VECTOR_ADDR]
         str     r2,[r0,#HAL_ARM_ABORT_VECTOR_ADDR]
-#ifdef CYGARC_HAL_DETECT_JUMP_TO_ZERO
-        ldr     r2,[r1,#0x14]   // jump to zero detection
-        str     r2,[r0,#0x00]
-        ldr     r2,[r1,#0x34]
-        str     r2,[r0,#0x20]
-#endif
 
         LED 4
 
@@ -452,7 +428,12 @@ start:
         mov     r0,#(CPSR_IRQ_DISABLE|CPSR_FIQ_DISABLE|CPSR_UNDEF_MODE)
         msr     cpsr,r0
         ldr     sp,.__exception_stack
-
+#ifndef CYGOPT_HAL_ARM_FIQ_DISABLE
+        mov     r0,#(CPSR_IRQ_DISABLE|CPSR_FIQ_DISABLE|CPSR_FIQ_MODE)
+        msr     cpsr,r0
+        ldr     sp,.__fiq_stack
+#endif
+        
         // initialize CPSR (machine state register)
         mov     r0,#(CPSR_IRQ_DISABLE|CPSR_FIQ_DISABLE|CPSR_SUPERVISOR_MODE)
         msr     cpsr,r0
@@ -468,7 +449,8 @@ start:
 #else        
         ldr     sp,.__startup_stack
 #endif        
-        // original
+
+        // clear BSS
         ldr     r1,.__bss_start
         ldr     r2,.__bss_end
         mov     r0,#0
@@ -482,28 +464,6 @@ start:
         // Run kernel + application in THUMB mode
         THUMB_MODE(r1,10)
 
-#if defined(CYGHWR_HAL_ARM_NEON)
-        /*
-        * enable NEON + VFP stuffs
-        */
-        /*
-        * enable access to CP10 and CP11
-        */
-        mrc p15, 0, r0, c1, c1, 2
-        bic r0, r0, #0x00000C00
-        mcr p15, 0, r0, c1, c1, 2
-        /*
-        * set access rule to CP10 and CP11
-        */
-        ldr r0, =0x00F00000
-        mcr p15, 0, r0, c1, c0, 2
-        isb
-        /*
-        * set FPEXC EN bit to enable the FPU
-        */
-        mov r0, #0x40000000
-        mcr p10, 7, r0, c8, c0, 0           // vmsr fpexc, r0
-#endif
         LED 3
         
         // Call platform specific hardware initialization
@@ -520,11 +480,7 @@ start:
 
 #if defined(CYGDBG_HAL_DEBUG_GDB_INCLUDE_STUBS) || \
     defined(CYGIMP_HAL_PROCESS_ALL_EXCEPTIONS)
-        // move vectors
-        mrc     p15,0,r0,c1,c0,0   // read control register
-        tst     r0,#0x2000         // test the V-Bit: location of exception vectors
-        moveq   r0,#0              // 0: exception table at 0
-        ldrne   r0,=0xFFFF0000     // 1: exception table at 0xFFFF0000
+        mov     r0,#0           // move vectors
         ldr     r1,=__exception_handlers
         ldr     r2,[r1,#0x04]   // undefined instruction
         str     r2,[r0,#0x04]
@@ -623,22 +579,6 @@ abort_data:
         mov     r3,sp
         b       call_exception_handler
         
-#ifdef CYGARC_HAL_DETECT_JUMP_TO_ZERO
-        .code   32
-jump_to_zero:   // extra handling if someone jumps to zero after remap
-        ldr     sp,.__jump_to_zero_stack        // get good stack
-        stmfd   sp!,{r0-r5}                     // save some supervisor regs
-        ldr     r0,=jump_to_zero_loop           // safe return value, in case the exception handler returns
-        mrs     r1,cpsr
-        orr     r1,r1,#CPSR_IRQ_DISABLE|CPSR_FIQ_DISABLE
-        bic     r1,r1,#CPSR_THUMB_ENABLE
-        msr     cpsr,r1
-        mov     r2,#CYGNUM_HAL_EXCEPTION_INTERRUPT // not really a software interrupt
-        mov     r3,sp
-        b       call_exception_handler
-jump_to_zero_loop:
-        b       jump_to_zero_loop
-#endif
 //
 // Dispatch an exception handler.
 
@@ -666,12 +606,6 @@ call_exception_handler:
         msr     cpsr,r4
 
         mov     r5,sp                   // save original svc sp
-#if defined(CYGHWR_HAL_ARM_NEON)
-        vmrs	r4, fpscr
-        stmfd	sp!,{r4}
-        vstmdb	sp!,{d16-d31}
-        vstmdb	sp!,{d0-d15}
-#endif
         mov	r4,lr                   // and original svc lr
 #ifdef CYGDBG_HAL_DEBUG_GDB_INCLUDE_STUBS
         // Make sure we use the GDB stack.
@@ -696,7 +630,7 @@ call_exception_handler:
         cmp     r2, #CPSR_USER_MODE
         bne     1f
         stmfd   sp, {r8-r12, sp, lr}^   // get user mode regs
-        nop
+	nop
         sub     sp, sp, #4*7
         bal     2f
 1:
@@ -752,13 +686,6 @@ call_exception_handler:
         //
 return_from_exception:
 
-#if defined(CYGHWR_HAL_ARM_NEON)
-        ldr r0, [sp, #armreg_fpscr]         // read fpscr from stack
-        vmsr    fpscr, r0
-        add     r0, sp, #armreg_fpscr
-        vldmdb  r0!,{d16-d31}
-        vldmdb  r0!,{d0-d15}
-#endif
         ldr     r0,[sp,#armreg_cpsr]
 
         // return to supervisor mode is simple
@@ -799,7 +726,7 @@ return_from_exception:
         add     r2, sp, #armreg_r8
         bne     1f
         ldmfd   r2, {r8-r14}^           // restore user mode regs
-        nop
+	nop
         bal     2f
 1:
 #else
@@ -848,6 +775,18 @@ __dump_procs:
 
         .code   32
 FIQ:
+#ifndef CYGOPT_HAL_ARM_FIQ_DISABLE
+        // If we are not disabling FIQs as part of eCos, these will be under
+        // user control. In theory the user should have installed their own
+        // FIQ VSR before enabling them and we should never come here. If
+        // we do there is nothing eCos itself can do because we are outside
+        // the scope of the system. The default action here, then, is to simply
+        // mask FIQs and return.
+        mrs     r8,spsr                 // CPSR at time of interrupt
+        orr	r8,r8,#CPSR_FIQ_DISABLE
+        msr	spsr,r8
+        subs	pc,lr,#4
+#else        
         // We can get here from any non-user mode.
         mrs     r8,spsr                 // CPSR at time of interrupt
         and     r9,r8,#CPSR_MODE_BITS   // isolate pre-interrupt mode
@@ -871,6 +810,7 @@ FIQ:
 
         // now it looks like we got an IRQ instead of an FIQ except that
         // FIQ is disabled so we don't recurse.
+#endif        
 IRQ:
         // Note: I use this exception stack while saving the context because
         // the current SP does not seem to be always valid in this CPU mode.
@@ -882,6 +822,17 @@ IRQ:
         mov     r3,sp
 	
         mrs     r4,cpsr                 // switch to Supervisor Mode
+
+#ifdef CYGOPT_HAL_ARM_FIQ_DISABLE        
+        // Due to a small chance of contention with FIQ,
+        // we should disable FIQ while still in IRQ mode and then
+        // change to SVC mode. This only applies when eCos is masking
+        // FIQ alongside IRQ, otherwise FIQs are outside eCos' control
+        // and the FIQ to IRQ translation doesn't happen.
+        orr     r4,r4,#CPSR_FIQ_DISABLE        
+        msr     cpsr,r4
+#endif        
+        
         bic     r4,r4,#CPSR_MODE_BITS
         // When handling an IRQ we must disable FIQ unless the current 
         // mode in CPSR is IRQ. If we were to get a FIQ while in another 
@@ -890,28 +841,23 @@ IRQ:
         // for example, the stack pointer would be set to the beginning 
         // of the exception_stack clobbering the registers we have just 
         // saved.
-        orr     r4,r4,#CPSR_SUPERVISOR_MODE|CPSR_FIQ_DISABLE
+        // However, if we are allowing the user to handle their own
+        // FIQs, we don't need to do that, since FIQ will not be
+        // translated to IRQ.
+        orr     r4,r4,#CPSR_SUPERVISOR_MODE|CPSR_INTR_MASK
         msr     cpsr,r4
 
         mov     r5,sp                   // save original svc sp
-
-#if defined(CYGHWR_HAL_ARM_NEON)
-        vmrs    r4, fpscr
-        stmfd   sp!,{r4}
-        vstmdb  sp!,{d16-d31}
-        vstmdb  sp!,{d0-d15}
-#endif
-
-        mov     r4,lr                   // save original svc lr
+	mov	r4,lr			// save original svc lr
         stmfd   sp!,{r0-r2,r4,r5}       // push svc_sp, svc_lr, vector, psr, pc
-        
+		
 #ifdef CYGOPT_HAL_ARM_WITH_USER_MODE
         // did exception occur in user mode ?
         and     r2, r1, #CPSR_MODE_BITS
         cmp     r2, #CPSR_USER_MODE
         bne     1f
         stmfd   sp, {r8-r12, sp, lr}^   // get user mode regs
-        nop
+	nop
         sub     sp, sp, #4*7
         bal     2f
 1:
@@ -925,7 +871,7 @@ IRQ:
         stmfd   r0!,{r8-r12,sp,lr}
         msr     cpsr,r2                 // back to svc mode
         mov     sp,r0                   // update stack pointer
-    
+	
 2:
         // now save pre-exception r0-r7 on current stack
         ldmfd   r3,{r0-r5}
@@ -1052,7 +998,6 @@ spurious_IRQ:
                               // don't run this for spurious interrupts!
         cmp     v1,#CYGNUM_HAL_INTERRUPT_NONE
         beq     17f
-
         ldr     r1,.hal_interrupt_objects
         ldr     r1,[r1,v1,lsl #2]
         mov     r2,v6           // register frame
@@ -1067,8 +1012,8 @@ spurious_IRQ:
 //      mov     r0,sp
 //      bl      show_frame_out
 
-        // return from IRQ is same as return from exception
-        b   return_from_exception
+	// return from IRQ is same as return from exception
+	b	return_from_exception
 
 #ifdef CYGIMP_HAL_COMMON_INTERRUPTS_USE_INTERRUPT_STACK
 // Execute pending DSRs the interrupt stack
@@ -1077,8 +1022,8 @@ FUNC_START_ARM(hal_interrupt_stack_call_pending_DSRs, r1)
         stmfd   sp!,{r4,r5,lr}
         // Disable interrupts
         mrs     r4,cpsr                 // disable IRQ's
-        orr     r2,r4,#CPSR_IRQ_DISABLE|CPSR_FIQ_DISABLE
-        bic     r5,r4,#CPSR_IRQ_DISABLE|CPSR_FIQ_DISABLE
+        orr     r2,r4,#CPSR_INTR_MASK
+        bic     r5,r4,#CPSR_INTR_MASK
         msr     cpsr,r2
         // Switch to interrupt stack
         mov     r3,sp                   // save old stack pointer
@@ -1099,7 +1044,7 @@ FUNC_START_ARM(hal_interrupt_stack_call_pending_DSRs, r1)
 
         // Disable interrupts
         mrs     r1,cpsr                 // disable IRQ's
-        orr     r2,r1,#CPSR_IRQ_DISABLE|CPSR_FIQ_DISABLE
+        orr     r2,r1,#CPSR_INTR_MASK
         msr     cpsr,r2
 
         // Move back to the thread stack.
@@ -1123,21 +1068,21 @@ FUNC_START_ARM(hal_interrupt_stack_call_pending_DSRs, r1)
 
 FUNC_START_ARM(hal_disable_interrupts, r1)
         mrs     r0,cpsr                 // current state
-        orr     r1,r0,#0xC0             // mask both FIQ and IRQ
+        orr     r1,r0,#CPSR_INTR_MASK   // mask interrupts
         msr     cpsr,r1
         bx      lr                      // exit, _old_ in r0        
 
 FUNC_START_ARM(hal_enable_interrupts, r1)
         mrs     r0,cpsr                 // current state
-        bic     r1,r0,#0xC0             // mask both FIQ and IRQ
+        bic     r1,r0,#CPSR_INTR_MASK   // mask interrupts
         msr     cpsr,r1
         bx      lr                      // exit
         
 FUNC_START_ARM(hal_restore_interrupts, r1)
         mrs     r1,cpsr                 // current state
-        bic     r1,r1,#0xC0             // mask out FIQ/IRQ bits
-        and     r0,r0,#0xC0             // keep only FIQ/IRQ
-        orr     r1,r1,r0                // mask both FIQ and IRQ
+        bic     r1,r1,#CPSR_INTR_MASK   // mask out interrupts
+        and     r0,r0,#CPSR_INTR_MASK   // keep only interrupts
+        orr     r1,r1,r0                // mask interrupts
         msr     cpsr,r1
         bx      lr                      // exit        
 
@@ -1147,6 +1092,38 @@ FUNC_START_ARM(hal_query_interrupts, r1)
 
 #endif // __thumb__
 
+#ifndef CYGOPT_HAL_ARM_FIQ_DISABLE
+
+// Functions for controlling FIQ independently of IRQ.
+// These are only present if we are not manipulating FIQs
+// alongside IRQs in the standard interrupt control macros.
+        
+FUNC_START_ARM(hal_disable_FIQ, r1)
+        mrs     r0,cpsr                 // current state
+        orr     r1,r0,#CPSR_FIQ_DISABLE // mask FIQs
+        msr     cpsr,r1
+        bx      lr                      // exit, _old_ in r0        
+
+FUNC_START_ARM(hal_enable_FIQ, r1)
+        mrs     r0,cpsr                 // current state
+        bic     r1,r0,#CPSR_FIQ_DISABLE // mask FIQs
+        msr     cpsr,r1
+        bx      lr                      // exit
+        
+FUNC_START_ARM(hal_restore_FIQ, r1)
+        mrs     r1,cpsr                 // current state
+        bic     r1,r1,#CPSR_FIQ_DISABLE // mask out FIQs
+        and     r0,r0,#CPSR_FIQ_DISABLE // keep only FIQs
+        orr     r1,r1,r0                // mask FIQs
+        msr     cpsr,r1
+        bx      lr                      // exit        
+
+FUNC_START_ARM(hal_query_FIQ, r1)
+        mrs     r0,cpsr                 // current state
+        bx      lr                      // exit, state in r0
+
+#endif
+        
 // Dummy/support functions
 
         .global __gccmain
@@ -1184,7 +1161,7 @@ _sp:
         mov     pc,lr
 #endif                
 
-
+
 //
 // Pointers to various objects.
 //
@@ -1195,9 +1172,6 @@ PTR(__GDB_stack)
 PTR(__startup_stack)
 PTR(__exception_stack)
 PTR(__undef_exception_stack)
-#ifdef CYGARC_HAL_DETECT_JUMP_TO_ZERO
-PTR(__jump_to_zero_stack)
-#endif
 PTR(__bss_start)
 PTR(__bss_end)
 PTR(_end)
@@ -1219,7 +1193,9 @@ PTR(__interrupt_stack)
 #ifdef  CYGHWR_HAL_ARM_DUMP_EXCEPTIONS
 PTR(__dump_procs)
 #endif
-
+#ifndef CYGOPT_HAL_ARM_FIQ_DISABLE        
+PTR(__fiq_stack)
+#endif        
 //
 // Identification - useful to find out when a system was configured
 _eCos_id:
@@ -1236,7 +1212,6 @@ _eCos_id:
 // Recompiling will not DTRT without manual intervention.
 
         .data
-        .section ".data","aw"
 
 init_flag:
         .balign 4
@@ -1269,21 +1244,25 @@ hal_interrupt_objects:
 
 // Small stacks, only used for saving information between CPU modes
 __exception_stack_base: 
-        .rept   32*4
+        .rept   32
         .long   0
         .endr
 __exception_stack:
-        .rept   32*4
+        .rept   32
         .long   0
         .endr
 __undef_exception_stack:
-#ifdef CYGARC_HAL_DETECT_JUMP_TO_ZERO
-        .rept   32*4
-        .long   0
-        .endr
-__jump_to_zero_stack:
-#endif
 
+#ifndef CYGOPT_HAL_ARM_FIQ_DISABLE
+        .balign 16
+__fiq_stack_base: 
+        .rept   CYGNUM_HAL_ARM_FIQ_STACK_SIZE
+        .byte   0
+        .endr
+        .balign 16        
+__fiq_stack:
+#endif
+        
 // Runtime stack used during all interrupt processing
 #ifndef CYGNUM_HAL_COMMON_INTERRUPTS_STACK_SIZE
 #define CYGNUM_HAL_COMMON_INTERRUPTS_STACK_SIZE 4096

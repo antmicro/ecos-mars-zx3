@@ -75,6 +75,10 @@
 #include <network.h>
 #include <arpa/inet.h>
 
+#ifdef CYGPKG_IO_PCMCIA
+#include <cyg/io/eth/netdev.h>
+#endif
+
 #ifdef CYGPKG_NET_DHCP
 #include <dhcp.h>
 #endif
@@ -102,9 +106,9 @@ const char  *eth1_name = "eth1";
 #endif
 
 #ifdef CYGPKG_NET_NLOOP
-# if 0 < CYGPKG_NET_NLOOP
-//
-//   Initialize loopback interface  ----------   Added by sorin@netappi.com
+#if 0 < CYGPKG_NET_NLOOP
+//  
+//   Initialize loopback interface  ----------   Added by sorin@netappi.com 
 //
 cyg_bool_t init_loopback_interface(int lo)
 {
@@ -115,14 +119,14 @@ cyg_bool_t init_loopback_interface(int lo)
     struct ecos_rtentry route;
     struct in_addr netmask, gateway;
 
-    s = socket(AF_INET, SOCK_DGRAM, 0);
+    s = socket(AF_INET, SOCK_DGRAM, 0); 
     if (s < 0) {
         perror("socket");
         return false;
     }
     if (setsockopt(s, SOL_SOCKET, SO_BROADCAST, &one, sizeof(one))) {
         perror("setsockopt");
-    close(s);
+	close(s);
         return false;
     }
 
@@ -133,27 +137,28 @@ cyg_bool_t init_loopback_interface(int lo)
     addrp->sin_port = 0;
     // Make an address 127.0.<lo>.1 to manage multiple loopback ifs.
     // (There is normally only 1, so it's the standard 127.0.0.1)
-    addrp->sin_addr.s_addr = htonl((0x100 * lo) + INADDR_LOOPBACK) ;
+    addrp->sin_addr.s_addr = htonl((0x100 * lo) + INADDR_LOOPBACK) ; 
 
-#  if CYGPKG_NET_NLOOP > 1
+#if CYGPKG_NET_NLOOP > 1
     // Init the one we were told to
     sprintf(ifr.ifr_name, "lo%d", lo);
-#  else
+#else
     strcpy(ifr.ifr_name, "lo0");
-#  endif
+#endif    
 
     if (ioctl(s, SIOCSIFADDR, &ifr)) {
         perror("SIOCIFADDR");
         close(s);
         return false;
     }
-
-#  if 1 < CYGPKG_NET_NLOOP
+    
+#if 1 < CYGPKG_NET_NLOOP
     // We cheat to make different nets for multiple loopback devs
     addrp->sin_addr.s_addr = netmask.s_addr = htonl(IN_CLASSC_NET);
-#  else
+#else
+    // 
     addrp->sin_addr.s_addr = netmask.s_addr = htonl(IN_CLASSA_NET);
-#  endif
+#endif
     if (ioctl(s, SIOCSIFNETMASK, &ifr)) {
         perror("SIOCSIFNETMASK");
         return false;
@@ -165,7 +170,7 @@ cyg_bool_t init_loopback_interface(int lo)
         return false;
     }
 
-    gateway.s_addr = htonl(INADDR_LOOPBACK);
+    gateway.s_addr = htonl(INADDR_LOOPBACK);  
     memset(&route, 0, sizeof(route));
     addrp->sin_family = AF_INET;
     addrp->sin_len = sizeof(*addrp);
@@ -176,7 +181,7 @@ cyg_bool_t init_loopback_interface(int lo)
     memcpy(&route.rt_genmask, addrp, sizeof(*addrp));
     addrp->sin_addr = gateway;
     memcpy(&route.rt_gateway, addrp, sizeof(*addrp));
-
+    
     route.rt_dev = ifr.ifr_name;
     route.rt_flags = RTF_UP|RTF_GATEWAY;
     route.rt_metric = 0;
@@ -194,14 +199,15 @@ cyg_bool_t init_loopback_interface(int lo)
     close(s);
     return true;
 }
-# endif
-#endif /* CYGPKG_NET_NLOOP */
+#endif
+#endif
 
 
 //
 // Internal function which builds up a fake BOOTP database for
 // an interface.
 //
+
 static unsigned char *
 add_tag(unsigned char *vp,
         unsigned char tag,
@@ -276,6 +282,9 @@ void
 init_all_network_interfaces(void)
 {
     static volatile int in_init_all_network_interfaces = 0;
+#ifdef CYGPKG_IO_PCMCIA
+    cyg_netdevtab_entry_t *t;
+#endif // CYGPKG_IO_PCMCIA
 #ifdef CYGOPT_NET_IPV6_ROUTING_THREAD
     int rs_wait = 40;
 #endif
@@ -292,42 +301,43 @@ init_all_network_interfaces(void)
 
 #ifdef CYGHWR_NET_DRIVER_ETH0
     if ( ! eth0_up ) { // Make this call idempotent
-# ifdef CYGHWR_NET_DRIVER_ETH0_MANUAL
-        /*
-         * Even if we're configuring the stack manually, at least
-         * initialize the stack to zeroes to make it easier to configure
-         * from the application.
-         */
-        eth0_up = true;
-        build_bootp_record(&eth0_bootp_data, eth0_name,
-                           "0.0.0.0",           // ip address
-                           "0.0.0.0",           // netmask
-                           "255.255.255.255",   // broadcast
-                           "0.0.0.0",           // gateway
-                           "0.0.0.0");          // server
-# endif
-# ifdef CYGHWR_NET_DRIVER_ETH0_BOOTP
+#ifdef CYGPKG_IO_PCMCIA
+        if ((t = eth_drv_netdev("eth0")) != (cyg_netdevtab_entry_t *)NULL) {
+            int tries = 0;
+            while (t->status != CYG_NETDEVTAB_STATUS_AVAIL) {
+                if (tries == 0) {
+                    diag_printf("... Waiting for PCMCIA device 'eth0'\n");
+                } 
+                if (++tries == 5) {
+                    diag_printf("... Giving up on PCMCIA device 'eth0'\n");
+                    goto bail_eth0;
+                }
+                cyg_thread_delay(100);
+            }
+        }
+#endif // CYGPKG_IO_PCMCIA
+#ifdef CYGHWR_NET_DRIVER_ETH0_BOOTP
         // Perform a complete initialization, using BOOTP/DHCP
         eth0_up = true;
-#  ifdef CYGHWR_NET_DRIVER_ETH0_DHCP
+#ifdef CYGHWR_NET_DRIVER_ETH0_DHCP
         eth0_dhcpstate = 0; // Says that initialization is external to dhcp
-        if (do_dhcp(eth0_name, &eth0_bootp_data, &eth0_dhcpstate, &eth0_lease))
-#  else
-#   ifdef CYGPKG_NET_DHCP
+        if (do_dhcp(eth0_name, &eth0_bootp_data, &eth0_dhcpstate, &eth0_lease)) 
+#else
+#ifdef CYGPKG_NET_DHCP
         eth0_dhcpstate = DHCPSTATE_BOOTP_FALLBACK;
         // so the dhcp machine does no harm if called
-#   endif
-        if (do_bootp(eth0_name, &eth0_bootp_data))
-#  endif
+#endif
+        if (do_bootp(eth0_name, &eth0_bootp_data)) 
+#endif
         {
-#  ifdef CYGHWR_NET_DRIVER_ETH0_BOOTP_SHOW
+#ifdef CYGHWR_NET_DRIVER_ETH0_BOOTP_SHOW
             show_bootp(eth0_name, &eth0_bootp_data);
-#  endif
+#endif
         } else {
             diag_printf("BOOTP/DHCP failed on eth0\n");
             eth0_up = false;
         }
-# elif defined(CYGHWR_NET_DRIVER_ETH0_ADDRS_IP)
+#elif defined(CYGHWR_NET_DRIVER_ETH0_ADDRS_IP)
         eth0_up = true;
         build_bootp_record(&eth0_bootp_data,
                            eth0_name,
@@ -337,49 +347,51 @@ init_all_network_interfaces(void)
                            string(CYGHWR_NET_DRIVER_ETH0_ADDRS_GATEWAY),
                            string(CYGHWR_NET_DRIVER_ETH0_ADDRS_SERVER));
         show_bootp(eth0_name, &eth0_bootp_data);
-# endif
+#endif
+#ifdef CYGPKG_IO_PCMCIA
+    bail_eth0:
+#endif
     }
-#endif /* CYGHWR_NET_DRIVER_ETH0 */
-
+#endif // CYGHWR_NET_DRIVER_ETH0
 #ifdef CYGHWR_NET_DRIVER_ETH1
     if ( ! eth1_up ) { // Make this call idempotent
-# ifdef CYGHWR_NET_DRIVER_ETH1_MANUAL
-        /*
-         * Even if we're configuring the stack manually, at least
-         * initialize the stack to zeroes to make it easier to configure
-         * from the application.
-         */
-        eth1_up = true;
-        build_bootp_record(&eth1_bootp_data, eth1_name,
-                           "0.0.0.0",           // ip address
-                           "0.0.0.0",           // netmask
-                           "255.255.255.255",   // broadcast
-                           "0.0.0.0",           // gateway
-                           "0.0.0.0");          // server
-# endif
-
-# ifdef CYGHWR_NET_DRIVER_ETH1_BOOTP
+#ifdef CYGPKG_IO_PCMCIA
+        if ((t = eth_drv_netdev("eth1")) != (cyg_netdevtab_entry_t *)NULL) {
+            int tries = 0;
+            while (t->status != CYG_NETDEVTAB_STATUS_AVAIL) {
+                if (tries == 0) {
+                    diag_printf("... Waiting for PCMCIA device 'eth1'\n");
+                } 
+                if (++tries == 5) {
+                    diag_printf("... Giving up on PCMCIA device 'eth1'\n");
+                    goto bail_eth1;
+                }
+                cyg_thread_delay(100);
+            }
+        }
+#endif // CYGPKG_IO_PCMCIA
+#ifdef CYGHWR_NET_DRIVER_ETH1_BOOTP
         // Perform a complete initialization, using BOOTP/DHCP
         eth1_up = true;
-#  ifdef CYGHWR_NET_DRIVER_ETH1_DHCP
+#ifdef CYGHWR_NET_DRIVER_ETH1_DHCP
         eth1_dhcpstate = 0; // Says that initialization is external to dhcp
-        if (do_dhcp(eth1_name, &eth1_bootp_data, &eth1_dhcpstate, &eth1_lease))
-#  else
-#   ifdef CYGPKG_NET_DHCP
+        if (do_dhcp(eth1_name, &eth1_bootp_data, &eth1_dhcpstate, &eth1_lease)) 
+#else
+#ifdef CYGPKG_NET_DHCP
         eth1_dhcpstate = DHCPSTATE_BOOTP_FALLBACK;
         // so the dhcp machine does no harm if called
-#   endif
+#endif
         if (do_bootp(eth1_name, &eth1_bootp_data))
-#  endif
+#endif
         {
-#  ifdef CYGHWR_NET_DRIVER_ETH1_BOOTP_SHOW
+#ifdef CYGHWR_NET_DRIVER_ETH1_BOOTP_SHOW
             show_bootp(eth1_name, &eth1_bootp_data);
-#  endif
+#endif
         } else {
             diag_printf("BOOTP/DHCP failed on eth1\n");
             eth1_up = false;
         }
-# elif defined(CYGHWR_NET_DRIVER_ETH1_ADDRS_IP)
+#elif defined(CYGHWR_NET_DRIVER_ETH1_ADDRS_IP)
         eth1_up = true;
         build_bootp_record(&eth1_bootp_data,
                            eth1_name,
@@ -389,44 +401,49 @@ init_all_network_interfaces(void)
                            string(CYGHWR_NET_DRIVER_ETH1_ADDRS_GATEWAY),
                            string(CYGHWR_NET_DRIVER_ETH1_ADDRS_SERVER));
         show_bootp(eth1_name, &eth1_bootp_data);
-# endif
+#endif
+#ifdef CYGPKG_IO_PCMCIA
+    bail_eth1:
+#endif
     }
-#endif /* CYGHWR_NET_DRIVER_ETH1 */
-
+#endif // CYGHWR_NET_DRIVER_ETH1
 #ifdef CYGHWR_NET_DRIVER_ETH0
+#ifndef CYGHWR_NET_DRIVER_ETH0_MANUAL
     if (eth0_up) {
         if (!init_net(eth0_name, &eth0_bootp_data)) {
             diag_printf("Network initialization failed for eth0\n");
             eth0_up = false;
         }
-# ifdef CYGHWR_NET_DRIVER_ETH0_IPV6_PREFIX
-        if (!init_net_IPv6(eth0_name, &eth0_bootp_data,
+#ifdef CYGHWR_NET_DRIVER_ETH0_IPV6_PREFIX
+        if (!init_net_IPv6(eth0_name, &eth0_bootp_data, 
                            string(CYGHWR_NET_DRIVER_ETH0_IPV6_PREFIX))) {
             diag_printf("Static IPv6 network initialization failed for eth0\n");
             eth0_up = false;  // ???
         }
-# endif
+#endif
     }
-#endif /* CYGHWR_NET_DRIVER_ETH0 */
-
+#endif
+#endif
 #ifdef CYGHWR_NET_DRIVER_ETH1
+#ifndef CYGHWR_NET_DRIVER_ETH1_MANUAL
     if (eth1_up) {
         if (!init_net(eth1_name, &eth1_bootp_data)) {
             diag_printf("Network initialization failed for eth1\n");
             eth1_up = false;
         }
-# ifdef CYGHWR_NET_DRIVER_ETH1_IPV6_PREFIX
-        if (!init_net_IPv6(eth1_name, &eth1_bootp_data,
+#ifdef CYGHWR_NET_DRIVER_ETH1_IPV6_PREFIX
+        if (!init_net_IPv6(eth1_name, &eth1_bootp_data, 
                            string(CYGHWR_NET_DRIVER_ETH1_IPV6_PREFIX))) {
             diag_printf("Static IPv6 network initialization failed for eth1\n");
             eth1_up = false; // ???
         }
-# endif
+#endif
     }
-#endif /* CYGHWR_NET_DRIVER_ETH1 */
+#endif
+#endif
 
 #ifdef CYGPKG_NET_NLOOP
-# if 0 < CYGPKG_NET_NLOOP
+#if 0 < CYGPKG_NET_NLOOP
     {
         static int loop_init = 0;
         int i;
@@ -434,8 +451,8 @@ init_all_network_interfaces(void)
             for ( i = 0; i < CYGPKG_NET_NLOOP; i++ )
                 init_loopback_interface( i );
     }
-# endif
-#endif /* CYGPKG_NET_NLOOP */
+#endif
+#endif
 
 #ifdef CYGOPT_NET_DHCP_DHCP_THREAD
     dhcp_start_dhcp_mgt_thread();
@@ -465,12 +482,13 @@ init_all_network_interfaces(void)
     {
       const char buf[] = _NAME;
       int len = strlen(_NAME);
-
+      
       setdomainname(buf,len);
     }
 #endif
     // Open the monitor to other threads.
     in_init_all_network_interfaces = 0;
+
 }
 
 // EOF network_support.c

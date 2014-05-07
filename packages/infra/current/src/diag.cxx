@@ -65,23 +65,7 @@
 #ifdef CYG_HAL_DIAG_LOCK_DATA_DEFN
 CYG_HAL_DIAG_LOCK_DATA_DEFN;
 #endif
-
-/************************************************************************/
-//TUPN.TEST
-
-#ifdef TEST_MACRO_USE_MEMORY_LOGGING
-
-#include <pkgconf/macros.h>
-
-#warning #### TUPN.TEST #### Modify log ouput ####
-#include <cyg/infra/mem_logging.h>
-
-#undef HAL_DIAG_WRITE_CHAR
-#define HAL_DIAG_WRITE_CHAR(ch)		MEM_LOG_WRITE_CHAR(ch)
-
-#endif
-/************************************************************************/
-
+  
 /*----------------------------------------------------------------------*/
 
 externC void diag_write_num(
@@ -389,8 +373,7 @@ _vprintf(void (*putc)(char c, void **param), void **param, const char *fmt, va_l
                     }
                 } else {
                     // Mask to unsigned, sized quantity
-                    // warning: longlong has the islong parameter turned on too.
-                    if (islong && (!islonglong)) {
+                    if (islong) {
                         val &= ((long long)1 << (sizeof(long) * 8)) - 1;
                     } else if (!islonglong) { // no need to mask longlong
                         val &= ((long long)1 << (sizeof(int) * 8)) - 1;
@@ -539,7 +522,6 @@ _sputc(char c, void **param)
 int
 diag_sprintf(char *buf, const char *fmt, ...)
 {        
-    int ret;
     va_list ap;
     struct _sputc_info info;
 
@@ -547,15 +529,14 @@ diag_sprintf(char *buf, const char *fmt, ...)
     info.ptr = buf;
     info.max = 1024;  // Unlimited
     info.len = 0;
-    ret = _vprintf(_sputc, (void **)&info, fmt, ap);
+    _vprintf(_sputc, (void **)&info, fmt, ap);
     va_end(ap);
-    return (info.len);
+    return info.len;
 }
 
 int
 diag_snprintf(char *buf, size_t len, const char *fmt, ...)
 {        
-    int ret;
     va_list ap;
     struct _sputc_info info;
 
@@ -563,7 +544,7 @@ diag_snprintf(char *buf, size_t len, const char *fmt, ...)
     info.ptr = buf;
     info.len = 0;
     info.max = len-1;
-    ret = _vprintf(_sputc, (void **)&info, fmt, ap);
+    _vprintf(_sputc, (void **)&info, fmt, ap);
     va_end(ap);
     return (info.len);
 }
@@ -571,13 +552,24 @@ diag_snprintf(char *buf, size_t len, const char *fmt, ...)
 int 
 diag_vsprintf(char *buf, const char *fmt, va_list ap)
 {
-    int ret;
     struct _sputc_info info;
 
     info.ptr = buf;
     info.max = 1024;  // Unlimited
     info.len = 0;
-    ret = _vprintf(_sputc, (void **)&info, fmt, ap);
+    _vprintf(_sputc, (void **)&info, fmt, ap);
+    return (info.len);
+}
+
+int 
+diag_vsnprintf(char *buf, size_t len, const char *fmt, va_list ap)
+{
+    struct _sputc_info info;
+
+    info.ptr = buf;
+    info.max = len-1;  
+    info.len = 0;
+    _vprintf(_sputc, (void **)&info, fmt, ap);
     return (info.len);
 }
 

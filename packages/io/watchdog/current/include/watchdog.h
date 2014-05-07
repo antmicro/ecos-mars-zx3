@@ -54,6 +54,5 @@
 externC void watchdog_start(void);
 externC void watchdog_reset(void);
 externC cyg_uint64 watchdog_get_resolution(void);
-externC void watchdog_init(void (*wdtAction)(CYG_ADDRWORD));
-externC void watchdog_uninstall(void);
+
 #endif // _IO_WATCHDOG_H_

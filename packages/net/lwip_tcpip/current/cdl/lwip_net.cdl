@@ -8,7 +8,7 @@
 #####ECOSGPLCOPYRIGHTBEGIN####
 ## -------------------------------------------
 ## This file is part of eCos, the Embedded Configurable Operating System.
-## Copyright (C) 2008, 2009, 2010 Free Software Foundation
+## Copyright (C) 2008, 2009, 2010, 2011 Free Software Foundation
 ##
 ## eCos is free software; you can redistribute it and/or modify it under
 ## the terms of the GNU General Public License as published by the Free
@@ -48,6 +48,7 @@
 cdl_package CYGPKG_NET_LWIP {
     display         "lwIP networking stack"
     description     "The lightweight TCP/IP stack."
+    requires        CYGPKG_ISOINFRA
     requires        CYGINT_ISO_ERRNO_CODES
 	
     compile         core/dns.c                  \
@@ -126,6 +127,17 @@ cdl_package CYGPKG_NET_LWIP {
         compile         ecos/sio.c
     }
     
+    cdl_option CYGIMP_LWIP_ENDIAN_BY_HAL {
+        display       "HAL optimized endian functions"
+        flavor        bool
+        active_if     CYGIMP_HAL_ARCH_ENDIAN
+        default_value CYGIMP_HAL_ARCH_ENDIAN
+        description   "
+            Some architectures provide optimized functions for endian
+            manipulation (byte swapping). If utilized, they can give
+            shorter and faster code for that."
+    }
+
     cdl_component CYGPKG_LWIP_APIS {
         display         "APIs"
         flavor          none
@@ -1422,6 +1434,33 @@ cdl_package CYGPKG_NET_LWIP {
                 to accomodate single full size TCP frame in one pbuf, including
                 TCP_MSS, IP header, and link header."
         }       
+
+        cdl_component CYGOPT_LWIP_MEM_PLF_SPEC {
+            display         "Platform/application specific memory settings"
+            flavor          none
+            no_define
+            description     "
+                Platform or application specific settings such as special
+                memory section and memory constrains."
+
+            cdl_option CYGSEM_LWIP_MEM_SECTION {
+                display         "Place lwIP buffers and heap in special\
+                                        memory section."
+                flavor          bool
+                default_value   is_active(CYGDAT_LWIP_MEM_SECTION_NAME)
+                active_if       CYGDAT_LWIP_MEM_SECTION_NAME
+
+                description     "
+                    If you need lwIP buffers to appear in some special
+                    memory section (it is useful for devices with low
+                    memory footprint that is in addition fragmented
+                    in several non-contiguous blocks) the platform
+                    config file should provide the name of this section
+                    through CYGDAT_LWIP_MEM_SECTION_NAME option, if so,
+                    you can let to use the GCC section attribute for
+                    needed variables by this option."
+            }
+        }
     }
     
     cdl_component CYGPKG_LWIP_THREADS {

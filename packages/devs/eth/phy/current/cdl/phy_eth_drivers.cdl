@@ -211,5 +211,6 @@ cdl_package CYGPKG_DEVS_ETH_PHY {
         compile       -library=libextras.a MV88E1518.c
         description "
           Include support for PHY Marvell 88E1518"
-    }
+    }	
+
 }

@@ -309,12 +309,10 @@ __externC void pthread_cleanup_pop_inner (struct pthread_cleanup_buffer *__buffe
 
 // -------------------------------------------------------------------------
 // eCos-specific function to measure stack usage of the supplied thread
-__externC size_t pthread_measure_stack_usage(pthread_t __pthread);
 
-// -------------------------------------------------------------------------
-// Extra functions for retrieving thread info
-__externC void * pthread_get_startarg(pthread_t __pthread);
-__externC int pthread_getstacksize(pthread_t thread, size_t * stacksize);
+#ifdef CYGFUN_KERNEL_THREADS_STACK_MEASUREMENT
+__externC size_t pthread_measure_stack_usage (pthread_t __pthread);
+#endif
 
 //-----------------------------------------------------------------------------
 #endif // ifndef CYGONCE_PTHREAD_H

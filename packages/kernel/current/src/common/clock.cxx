@@ -5,37 +5,37 @@
 //      Clock class implementations
 //
 //==========================================================================
-// ####ECOSGPLCOPYRIGHTBEGIN####
-// -------------------------------------------
-// This file is part of eCos, the Embedded Configurable Operating System.
+// ####ECOSGPLCOPYRIGHTBEGIN####                                            
+// -------------------------------------------                              
+// This file is part of eCos, the Embedded Configurable Operating System.   
 // Copyright (C) 1998, 1999, 2000, 2001, 2002 Free Software Foundation, Inc.
 //
-// eCos is free software; you can redistribute it and/or modify it under
-// the terms of the GNU General Public License as published by the Free
-// Software Foundation; either version 2 or (at your option) any later
-// version.
+// eCos is free software; you can redistribute it and/or modify it under    
+// the terms of the GNU General Public License as published by the Free     
+// Software Foundation; either version 2 or (at your option) any later      
+// version.                                                                 
 //
-// eCos is distributed in the hope that it will be useful, but WITHOUT
-// ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-// FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-// for more details.
+// eCos is distributed in the hope that it will be useful, but WITHOUT      
+// ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or    
+// FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License    
+// for more details.                                                        
 //
-// You should have received a copy of the GNU General Public License
-// along with eCos; if not, write to the Free Software Foundation, Inc.,
-// 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+// You should have received a copy of the GNU General Public License        
+// along with eCos; if not, write to the Free Software Foundation, Inc.,    
+// 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.            
 //
-// As a special exception, if other files instantiate templates or use
-// macros or inline functions from this file, or you compile this file
-// and link it with other works to produce a work based on this file,
-// this file does not by itself cause the resulting work to be covered by
-// the GNU General Public License. However the source code for this file
-// must still be made available in accordance with section (3) of the GNU
-// General Public License v2.
+// As a special exception, if other files instantiate templates or use      
+// macros or inline functions from this file, or you compile this file      
+// and link it with other works to produce a work based on this file,       
+// this file does not by itself cause the resulting work to be covered by   
+// the GNU General Public License. However the source code for this file    
+// must still be made available in accordance with section (3) of the GNU   
+// General Public License v2.                                               
 //
-// This exception does not invalidate any other reasons why a work based
-// on this file might be covered by the GNU General Public License.
-// -------------------------------------------
-// ####ECOSGPLCOPYRIGHTEND####
+// This exception does not invalidate any other reasons why a work based    
+// on this file might be covered by the GNU General Public License.         
+// -------------------------------------------                              
+// ####ECOSGPLCOPYRIGHTEND####                                              
 //==========================================================================
 //#####DESCRIPTIONBEGIN####
 //
@@ -50,6 +50,7 @@
 //####DESCRIPTIONEND####
 //
 //==========================================================================
+
 #include <pkgconf/kernel.h>
 
 #include <cyg/kernel/ktypes.h>         // base kernel types
@@ -99,7 +100,7 @@ Cyg_Counter::~Cyg_Counter()
 }
 
 // -------------------------------------------------------------------------
-//
+// 
 
 #ifdef CYGDBG_USE_ASSERTS
 
@@ -107,7 +108,7 @@ cyg_bool Cyg_Counter::check_this( cyg_assert_class_zeal zeal) const
 {
     // check that we have a non-NULL pointer first
     if( this == NULL ) return false;
-
+    
     switch( zeal )
     {
     case cyg_system_test:
@@ -137,7 +138,7 @@ void Cyg_Counter::tick( cyg_uint32 ticks )
     // Increment the counter in a loop so we process
     // each tick separately. This is easier than trying
     // to cope with a range of increments.
-
+    
     while( ticks-- )
     {
         Cyg_Scheduler::lock();
@@ -159,10 +160,10 @@ void Cyg_Counter::tick( cyg_uint32 ticks )
         // With multiple lists, each one contains only the alarms
         // that will expire at a given tick modulo the list number.
         // So we only have a fraction of the alarms to check here.
-
+        
         alarm_list_ptr = &(alarm_list[
                                (counter/increment) % CYGNUM_KERNEL_COUNTERS_MULTI_LIST_SIZE ] );
-
+    
 #else
 #error "No CYGIMP_KERNEL_COUNTERS_x_LIST config"
 #endif
@@ -178,9 +179,9 @@ void Cyg_Counter::tick( cyg_uint32 ticks )
         while( !alarm_list_ptr->empty() )
         {
             Cyg_Alarm *alarm = alarm_list_ptr->get_head();
-
+        
             CYG_ASSERTCLASS(alarm, "Bad alarm in counter list" );
-
+            
             if( alarm->trigger <= counter )
             {
                 // remove alarm from list
@@ -197,15 +198,15 @@ void Cyg_Counter::tick( cyg_uint32 ticks )
                 else alarm->enabled = false;
 
                 CYG_INSTRUMENT_ALARM( CALL, this, alarm );
-
+                
                 // call alarm function
                 alarm->alarm(alarm, alarm->data);
 
                 // all done, loop
             }
             else break;
-
-        }
+            
+        } 
 #else
 
         // With unsorted lists we must scan the whole list for
@@ -217,18 +218,18 @@ void Cyg_Counter::tick( cyg_uint32 ticks )
         // alarm function.
 
         cyg_bool rescan = true;
-        Cyg_DNode_T<Cyg_Alarm> *prev = 0 ;
 
         while( rescan )
         {
             Cyg_DNode_T<Cyg_Alarm> *node = alarm_list_ptr->get_head();
 
             rescan = false;
-
+            
             while( node != NULL )
             {
                 Cyg_Alarm *alarm = CYG_CLASSFROMBASE( Cyg_Alarm, Cyg_DNode, node );
                 Cyg_DNode_T<Cyg_Alarm> *next = alarm->get_next();
+
                 CYG_ASSERTCLASS(alarm, "Bad alarm in counter list" );
 
                 if( alarm->trigger <= counter )
@@ -246,7 +247,7 @@ void Cyg_Counter::tick( cyg_uint32 ticks )
                     else alarm->enabled = false;
 
                     CYG_INSTRUMENT_ALARM( CALL, this, alarm );
-
+                
                     // Call alarm function
                     alarm->alarm(alarm, alarm->data);
 
@@ -261,22 +262,17 @@ void Cyg_Counter::tick( cyg_uint32 ticks )
                 // with.
                 if( next == alarm_list_ptr->get_head() || node == next )
                     node = NULL;
-                else {
-                    /* for debugging */
-                    prev = node;
-
+                else
                     node = next;
-                }
-
             }
 
         }
-
-#endif
+        
+#endif        
         Cyg_Scheduler::unlock();
 
     }
-
+    
 }
 
 // -------------------------------------------------------------------------
@@ -289,13 +285,13 @@ void Cyg_Counter::add_alarm( Cyg_Alarm *alarm )
     CYG_ASSERTCLASS( this, "Bad counter object" );
     CYG_ASSERTCLASS( alarm, "Bad alarm passed" );
     CYG_ASSERT( Cyg_Scheduler::get_sched_lock() > 0, "Scheduler not locked");
-
+    
     // set this now to allow an immediate handler call to manipulate
     // this alarm sensibly.
     alarm->enabled = true;
 
     // Check here for an alarm that triggers now or in the past and
-    // call its alarm function immediately.
+    // call its alarm function immediately. 
     if( alarm->trigger <= counter )
     {
         CYG_INSTRUMENT_ALARM( CALL, this, alarm );
@@ -303,7 +299,7 @@ void Cyg_Counter::add_alarm( Cyg_Alarm *alarm )
         // call alarm function. Note that this is being
         // called here before the add_alarm has returned.
         // Note that this function may disable the alarm.
-
+        
         alarm->alarm(alarm, alarm->data);
 
         // Note that this extra check on alarm->enabled is in case the
@@ -326,9 +322,9 @@ void Cyg_Counter::add_alarm( Cyg_Alarm *alarm )
             return;
         }
     }
-
+    
     CYG_INSTRUMENT_ALARM( ADD, this, alarm );
-
+ 
     // Find the pointer to the relevant list _after_ a retrigger
     // alarm has been given its new trigger time.
 
@@ -343,17 +339,17 @@ void Cyg_Counter::add_alarm( Cyg_Alarm *alarm )
     // Each alarm must go into the list that covers the tick that is
     // going to happen _after_ the trigger time (or at it if trigger
     // happens to fall on a tick.
-
+    
     alarm_list_ptr = &(alarm_list[
         ((alarm->trigger+increment-1)/increment) %
         CYGNUM_KERNEL_COUNTERS_MULTI_LIST_SIZE ] );
-
+    
 #else
 #error "No CYGIMP_KERNEL_COUNTERS_x_LIST config"
 #endif
 
 #ifdef CYGIMP_KERNEL_COUNTERS_SORT_LIST
-
+        
     // Now that we have the list pointer, we can use common code for
     // both list organizations.
 
@@ -368,7 +364,7 @@ void Cyg_Counter::add_alarm( Cyg_Alarm *alarm )
             // The alarms are in ascending trigger order. If we
             // find an alarm that triggers later than us, we go
             // in front of it.
-
+        
             if( list_alarm->trigger > alarm->trigger )
             {
                 alarm_list_ptr->insert( list_alarm, alarm );
@@ -376,7 +372,7 @@ void Cyg_Counter::add_alarm( Cyg_Alarm *alarm )
             }
 
             list_alarm = list_alarm->get_next();
-
+            
         } while( list_alarm != alarm_list_ptr->get_head() );
         // a lower or equal alarm time was not found, so drop through
         // so it is added to the list tail
@@ -396,7 +392,7 @@ void Cyg_Counter::rem_alarm( Cyg_Alarm *alarm )
     CYG_ASSERTCLASS( this, "Bad counter object" );
     CYG_ASSERTCLASS( alarm, "Bad alarm passed" );
     CYG_ASSERT( Cyg_Scheduler::get_sched_lock() > 0, "Scheduler not locked");
-
+    
     Cyg_Alarm_List *alarm_list_ptr;     // pointer to list
 
 #if defined(CYGIMP_KERNEL_COUNTERS_SINGLE_LIST)
@@ -408,7 +404,7 @@ void Cyg_Counter::rem_alarm( Cyg_Alarm *alarm )
     alarm_list_ptr = &(alarm_list[
         ((alarm->trigger+increment-1)/increment) %
                               CYGNUM_KERNEL_COUNTERS_MULTI_LIST_SIZE ] );
-
+    
 #else
 #error "No CYGIMP_KERNEL_COUNTERS_x_LIST config"
 #endif
@@ -419,7 +415,7 @@ void Cyg_Counter::rem_alarm( Cyg_Alarm *alarm )
     CYG_INSTRUMENT_ALARM( REM, this, alarm );
 
     alarm_list_ptr->remove( alarm );
-
+    
     alarm->enabled = false;
 
 }
@@ -446,7 +442,7 @@ Cyg_Clock::~Cyg_Clock()
 }
 
 // -------------------------------------------------------------------------
-//
+// 
 
 #ifdef CYGDBG_USE_ASSERTS
 
@@ -454,7 +450,7 @@ cyg_bool Cyg_Clock::check_this( cyg_assert_class_zeal zeal) const
 {
     // check that we have a non-NULL pointer first
     if( this == NULL ) return false;
-
+    
     switch( zeal )
     {
     case cyg_system_test:
@@ -473,10 +469,10 @@ cyg_bool Cyg_Clock::check_this( cyg_assert_class_zeal zeal) const
 #endif
 
 // -------------------------------------------------------------------------
-//
+// 
 // Clock Converters: split a rational into 4 factors to try to prevent
 // overflow whilst retaining reasonable accuracy.
-//
+// 
 // typically we get numbers like 1,000,000 for ns_per and
 // 100 and 1,000,000,000 for the dividend and divisor.
 // So we want answers like 1/10 and 10/1 out of these routines.
@@ -557,7 +553,7 @@ static void construct_converter( Cyg_Clock::converter *pcc,
                 cont = (d2 < d1);
             }
         }
-
+        
         // move powers of 2 from m1 to m2 so long as we do not go less than d1
         while ( (0 == (1 & m1)) && (m2 < m1) && (m1 > (d1 << 5)) ) {
             m1 >>= 1;
@@ -565,7 +561,7 @@ static void construct_converter( Cyg_Clock::converter *pcc,
             if ( m1 < 0x10000 )
                 break;
         }
-
+        
         // and factors from the table - ensure m1 stays well larger than d1
         cont = ((m2 < m1) && (m1 > (d1 << 4)) && (m1 > 0x10000));
         for ( i = 0 ; cont && (i < (sizeof( primes )/sizeof( primes[0] ))); i++ ) {
@@ -670,7 +666,7 @@ Cyg_Alarm::~Cyg_Alarm()
 }
 
 // -------------------------------------------------------------------------
-//
+// 
 
 #ifdef CYGDBG_USE_ASSERTS
 
@@ -678,7 +674,7 @@ cyg_bool Cyg_Alarm::check_this( cyg_assert_class_zeal zeal) const
 {
     // check that we have a non-NULL pointer first
     if( this == NULL ) return false;
-
+    
     switch( zeal )
     {
     case cyg_system_test:
@@ -700,7 +696,7 @@ cyg_bool Cyg_Alarm::check_this( cyg_assert_class_zeal zeal) const
 // -------------------------------------------------------------------------
 // Initialize Alarm and enable
 
-void Cyg_Alarm::initialize(
+void Cyg_Alarm::initialize(                
     cyg_tick_count    t,                // Absolute trigger time
     cyg_tick_count    i                 // Relative retrigger interval
     )
@@ -708,9 +704,9 @@ void Cyg_Alarm::initialize(
     CYG_REPORT_FUNCTION();
 
     Cyg_Scheduler::lock();
-
+    
     // If already enabled, remove from counter
-
+    
     if( enabled ) counter->rem_alarm(this);
 
     CYG_INSTRUMENT_ALARM( INIT,     this, 0 );
@@ -720,13 +716,13 @@ void Cyg_Alarm::initialize(
     CYG_INSTRUMENT_ALARM( INTERVAL,
                           ((cyg_uint32 *)&i)[0],
                           ((cyg_uint32 *)&i)[1] );
-
+ 
     trigger = t;
     interval = i;
 
     counter->add_alarm(this);
 
-    Cyg_Scheduler::unlock();
+    Cyg_Scheduler::unlock();    
 }
 
 // -------------------------------------------------------------------------
@@ -762,7 +758,7 @@ Cyg_Alarm::synchronize( void )
 void Cyg_Alarm::enable()
 {
     Cyg_Scheduler::lock();
-
+    
     if( !enabled )
     {
         // ensure the alarm time is in our future:
@@ -771,7 +767,7 @@ void Cyg_Alarm::enable()
         counter->add_alarm(this);
     }
 
-    Cyg_Scheduler::unlock();
+    Cyg_Scheduler::unlock();    
 }
 
 // -------------------------------------------------------------------------
@@ -800,7 +796,7 @@ void Cyg_Alarm::get_times(
 
     if( t != NULL ) *t = trigger;
     if( i != NULL ) *i = interval;
-
+    
     Cyg_Scheduler::unlock();
 }
 
@@ -840,7 +836,7 @@ Cyg_RealTimeClock::Cyg_RealTimeClock()
     CYG_REPORT_FUNCTION();
 
     HAL_CLOCK_INITIALIZE( CYGNUM_KERNEL_COUNTERS_RTC_PERIOD );
-
+    
     interrupt.attach();
 
     interrupt.unmask_interrupt(CYGNUM_HAL_INTERRUPT_RTC);
@@ -867,7 +863,6 @@ cyg_uint32 clock_dsr_start = 0;
 cyg_uint32 Cyg_RealTimeClock::isr(cyg_vector vector, CYG_ADDRWORD data)
 {
 //    CYG_REPORT_FUNCTION();
-//	* (cyg_uint32 *) 0xFFFFF610 = ((unsigned int)1 << 7);
 
 #if defined(CYGVAR_KERNEL_COUNTERS_CLOCK_LATENCY) && defined(HAL_CLOCK_LATENCY)
     if (measure_clock_latency) {
@@ -892,7 +887,7 @@ cyg_uint32 Cyg_RealTimeClock::isr(cyg_vector vector, CYG_ADDRWORD data)
 
 #if defined(CYGVAR_KERNEL_COUNTERS_CLOCK_DSR_LATENCY)
     HAL_CLOCK_READ(&clock_dsr_start);
-#endif
+#endif    
     return Cyg_Interrupt::CALL_DSR|Cyg_Interrupt::HANDLED;
 }
 
@@ -916,22 +911,22 @@ void Cyg_RealTimeClock::dsr(cyg_vector vector, cyg_ucount32 count, CYG_ADDRWORD 
             if (max_clock_dsr_latency < delta) max_clock_dsr_latency = delta;
         }
     }
-#endif
+#endif    
 
     Cyg_RealTimeClock *rtc = (Cyg_RealTimeClock *)data;
 
     CYG_INSTRUMENT_CLOCK( TICK_START,
                           rtc->current_value_lo(),
                           rtc->current_value_hi());
-
+                          
     rtc->tick( count );
-//    * (cyg_uint32 *) 0xFFFFF614 = ((unsigned int)1 << 7);
+
 #ifdef CYGSEM_KERNEL_SCHED_TIMESLICE
 #if    0 == CYGINT_KERNEL_SCHEDULER_UNIQUE_PRIORITIES
 
     // If timeslicing is enabled, call the scheduler to
     // handle it. But not if we have unique priorities.
-
+    
     Cyg_Scheduler::scheduler.timeslice();
 
 #endif
@@ -940,7 +935,7 @@ void Cyg_RealTimeClock::dsr(cyg_vector vector, cyg_ucount32 count, CYG_ADDRWORD 
     CYG_INSTRUMENT_CLOCK( TICK_END,
                           rtc->current_value_lo(),
                           rtc->current_value_hi());
-
+    
 }
 
 #endif

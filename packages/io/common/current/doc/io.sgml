@@ -1091,7 +1091,7 @@ routines. This table is defined by the macro:</PARA>
 
 
 <PROGRAMLISTING>
-DEVIO_TABLE(l, write, read, get_config, set_config)
+DEVIO_TABLE(l, write, read, select, get_config, set_config)
 </PROGRAMLISTING>
 
 <variablelist>
@@ -1109,6 +1109,11 @@ DEVIO_TABLE(l, write, read, get_config, set_config)
     <term>read</term>
     <listitem><para>The function called as a result of
     <function>cyg_io_read()</function>. </para></listitem>
+  </varlistentry>
+  <varlistentry>
+    <term>select</term>
+    <listitem><para>The function called as a result of
+    <function>cyg_io_select()</function>. </para></listitem>
   </varlistentry>
   <varlistentry>
     <term>get_config</term>
@@ -1433,11 +1438,11 @@ CYGINT_IO_SERIAL_BLOCK_TRANSFER&quot;).  In that case, the following
 functions are available as well:</PARA>
 
 <PROGRAMLISTING>
-bool (*data_xmt_req)(serial_channel *chan,
+xmt_req_reply_t (*data_xmt_req)(serial_channel *chan,
                      int space,
                      int* chars_avail,
                      unsigned char** chars)
-void (*data_xmt_done)(serial_channel *chan)
+void (*data_xmt_done)(serial_channel *chan, int chars_sent)
 </PROGRAMLISTING>
 
 <PARA>
@@ -1460,11 +1465,11 @@ driver must call <function>data_xmt_done()</function>.</PARA>
 
 
 <PROGRAMLISTING>
-bool (*data_rcv_req)(serial_channel *chan,
+rcv_req_reply_t (*data_rcv_req)(serial_channel *chan,
                      int avail,
                      int* space_avail,
                      unsigned char** space)
-void (*data_rcv_done)(serial_channel *chan)
+void (*data_rcv_done)(serial_channel *chan, int chars_rcvd)
 </PROGRAMLISTING>
 
 <PARA>Instead of calling <function>rcv_char()</function> with a single

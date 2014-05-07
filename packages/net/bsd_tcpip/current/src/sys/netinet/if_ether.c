@@ -128,19 +128,15 @@ SYSCTL_INT(_net_link_ether_inet, OID_AUTO, proxyall, CTLFLAG_RW,
 	   &arp_proxyall, 0, "");
 
 static void	arp_rtrequest __P((int, struct rtentry *, struct sockaddr *));
-void	arprequest __P((struct arpcom *,
+static void	arprequest __P((struct arpcom *,
 			struct in_addr *, struct in_addr *, u_char *));
 static void	arpintr __P((void));
 static void	arptfree __P((struct llinfo_arp *));
 static void	arptimer __P((void *));
-struct llinfo_arp
+static struct llinfo_arp
 		*arplookup __P((u_long, int, int));
 #ifdef INET
 static void	in_arpinput __P((struct mbuf *));
-struct in_arpinput_aux_t {
-    void        (*inaddrFunc)(in_addr_t, unsigned char *);
-};
-struct in_arpinput_aux_t in_arpinput_aux = {0};
 #endif
 
 /*
@@ -302,7 +298,7 @@ arp_rtrequest(req, rt, sa)
  *	- arp header target ip address
  *	- arp header source ethernet address
  */
-void
+static void
 arprequest(ac, sip, tip, enaddr)
 	register struct arpcom *ac;
 	register struct in_addr *sip, *tip;
@@ -527,13 +523,6 @@ SYSCTL_INT(_net_link_ether_inet, OID_AUTO, log_arp_wrong_iface, CTLFLAG_RW,
 	&log_arp_wrong_iface, 0,
 	"log arp packets arriving on the wrong interface");
 
-/* The following has been provided by Microplex Systems Ltd. */
-void
-arp_setauxin_func(void (*inaddrFunc)(in_addr_t, unsigned char *))
-{
-    in_arpinput_aux.inaddrFunc = inaddrFunc;
-} /* arp_setauxin_func */
-
 static void
 in_arpinput(m)
 	struct mbuf *m;
@@ -604,28 +593,6 @@ in_arpinput(m)
 		itaddr = myaddr;
 		goto reply;
 	}
-
-    /*
-     * The following has been provided by Microplex Systems Ltd. as a means
-     * for the application to snoop on incoming Arp Reply traffic.
-     */
-    if ( (op == ARPOP_REPLY) && (in_arpinput_aux.inaddrFunc) ) {
-        /* Check if the ARP reply is for us. Target address matches the configured address. */
-        if ( itaddr.s_addr == myaddr.s_addr ) {
-            /* Call the auxillary ARP input function with the sources IP address */
-            in_arpinput_aux.inaddrFunc(isaddr.s_addr, ea->arp_sha);
-        }
-        /*
-         * Also check for anit-spoofing replies, which may also be replies for us.
-         * If we send an ARP request with zero-IP source, the responder may fill
-         * in the target and source information in the reply with the same information.
-         */
-        else if ( (itaddr.s_addr == isaddr.s_addr) && ( memcmp(ea->arp_tha, ea->arp_sha, sizeof(ea->arp_sha)) == 0 ) ) {
-            /* Call the auxillary ARP input function with the sources IP address */
-            in_arpinput_aux.inaddrFunc(isaddr.s_addr, ea->arp_sha);
-        }
-    }
-
 	la = arplookup(isaddr.s_addr, itaddr.s_addr == myaddr.s_addr, 0);
 	if (la && (rt = la->la_rt) && (sdl = SDL(rt->rt_gateway))) {
 		/* the following is not an error when doing bridging */
@@ -818,7 +785,7 @@ arptfree(la)
 /*
  * Lookup or enter a new address in arptab.
  */
-struct llinfo_arp *
+static struct llinfo_arp *
 arplookup(addr, create, proxy)
 	u_long addr;
 	int create, proxy;
@@ -840,13 +807,25 @@ arplookup(addr, create, proxy)
 		why = "could not allocate llinfo";
 	else if (rt->rt_gateway->sa_family != AF_LINK)
 		why = "gateway route is not ours";
-
-	if (why && create) {
-		log(LOG_DEBUG, "arplookup %s failed: %s\n",
-		    inet_ntoa(sin.sin_addr), why);
-		return 0;
-	} else if (why) {
-		return 0;
+	
+	if (why) {
+		if (create) {
+			log(LOG_DEBUG, "arplookup %s failed: %s\n",
+			    inet_ntoa(sin.sin_addr), why);
+			/*
+			 * If there are no references to this Layer 2 route,
+			 * and it is a cloned route, and not static, and
+			 * arplookup() is creating the route, then purge
+			 * it from the routing table as it is probably bogus.
+			 */
+			if (((rt->rt_flags & (RTF_STATIC | RTF_WASCLONED)) ==
+			    RTF_WASCLONED) && (rt->rt_refcnt == 0))
+				rtrequest(RTM_DELETE,
+				    (struct sockaddr *)rt_key(rt),
+				    rt->rt_gateway, rt_mask(rt),
+				    rt->rt_flags, 0);
+		}
+		return (0);
 	}
 	return ((struct llinfo_arp *)rt->rt_llinfo);
 }

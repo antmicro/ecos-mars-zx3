@@ -8,7 +8,7 @@
 // ####ECOSGPLCOPYRIGHTBEGIN####                                            
 // -------------------------------------------                              
 // This file is part of eCos, the Embedded Configurable Operating System.   
-// Copyright (C) 2012 Free Software Foundation, Inc.                        
+// Copyright (C) 2012, 2013 Free Software Foundation, Inc.                        
 //
 // eCos is free software; you can redistribute it and/or modify it under    
 // the terms of the GNU General Public License as published by the Free     
@@ -64,33 +64,44 @@
 #include <cyg/hal/hal_intr.h>           // HAL header
 #include <cyg/hal/hal_if.h>             // HAL header
 
-
-
 // DDRAM Controller
 #ifdef CYGPKG_HAL_CORTEXM_KINETIS_DDRMC
+
+// DDRAM controller register indices.
+const cyg_uint8 const kinetis_ddr_reg_ix[] = {
+    0,
+    2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16,
+    20, 21, 22, 23,
+    25, 26, 27, 28, 29, 30,
+    34,
+    36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50,
+    52, 53, 54, 55, 56, 57
+};
+
 // Initialize DDRAM controller.
 // inidat[] is an array of ordered pairs: (register-index, register-value).
 void CYGOPT_HAL_KINETIS_MISC_FLASH_SECTION_ATTR
-hal_cortexm_kinetis_ddrmc_init(const cyg_uint32 inidat[], cyg_uint32 num)
+hal_cortexm_kinetis_ddrmc_init(const cyg_uint32 inidat[])
 {
     cyghwr_hal_kinetis_ddrmc_t* ddrmc_p = CYGHWR_HAL_KINETIS_DDRMC_P;
     cyghwr_hal_kinetis_sim_t *sim_p = CYGHWR_HAL_KINETIS_SIM_P;
     volatile cyg_uint32* cr_p;
+    cyg_uint32 cr_ix;
     cyg_uint32 cr_i;
     cyg_uint32 regval;
-
-    sim_p->scgc3 |= CYGHWR_HAL_KINETIS_SIM_SCGC3_DDR_M;
+    
+    CYGHWR_IO_CLOCK_ENABLE(CYGHWR_HAL_KINETIS_SIM_SCGC_DDR);
 
     regval = sim_p->mcr & ~CYGHWR_HAL_KINETIS_SIM_MCR_DDR_SETUP_M;
     sim_p->mcr   = regval | CYGHWR_HAL_KINETIS_SIM_MCR_DDR_SETUP;
 
     ddrmc_p->rcr |= CYGHWR_HAL_KINETIS_DDRMC_RCR_RST_M;
-    ddrmc_p->pad_ctrl = 0x01030203;
+    ddrmc_p->pad_ctrl = CYGHWR_HAL_KINETIS_DDRMC_PAD_CTRL;
     cr_p = ddrmc_p->cr;
-    do {
-        cr_i = *inidat++;
+    for(cr_ix = 0; cr_ix < sizeof(kinetis_ddr_reg_ix); cr_ix++) {
+        cr_i = kinetis_ddr_reg_ix[cr_ix];
         cr_p[cr_i] = *inidat++;
-    } while(--num);
+    };
     __asm__ volatile ("nop\n");
     ddrmc_p->cr[0] |= CYGHWR_HAL_KINETIS_DDRMC_CR00_START;
     while(!(ddrmc_p->cr[30] & CYGHWR_HAL_KINETIS_DDRMC_CR30_DRAM_INIT_CPL));

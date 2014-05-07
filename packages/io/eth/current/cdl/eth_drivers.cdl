@@ -173,7 +173,7 @@ cdl_package CYGPKG_IO_ETH_DRIVERS {
     cdl_component CYGPKG_IO_ETH_DRIVERS_STAND_ALONE {
         display       "Support for stand-alone network stack."
         flavor        bool
-        active_if     { !CYGPKG_NET && !CYGPKG_NET_LWIP && !CYGPKG_IO_ETH_DRIVERS_PROFINET}
+        active_if     { !CYGPKG_NET && !CYGPKG_NET_LWIP }
         requires      CYGINT_ISO_STRING_MEMFUNCS 
         default_value 1
         compile       stand_alone/eth_drv.c
@@ -208,26 +208,6 @@ cdl_package CYGPKG_IO_ETH_DRIVERS {
                Selecting this option will allows the stand-alone ethernet driver
                to display warnings on the system console when incoming network
                packets are being discarded due to lack of buffer space."
-        }
-    }
-	
-	    cdl_component CYGPKG_IO_ETH_DRIVERS_PROFINET {
-        display       "Support for ProfiNET network stack."
-        flavor        bool
-        active_if     { !CYGPKG_NET && !CYGPKG_NET_LWIP && !CYGPKG_IO_ETH_DRIVERS_STAND_ALONE}
-        requires      CYGINT_ISO_STRING_MEMFUNCS 
-        default_value 0
-        compile       profinet/eth_drv.c
-
-        cdl_option CYGNUM_IO_ETH_DRIVERS_NUM_PKT_PN {
-            display          "Number of \[network\] buffers"
-            flavor           data
-            default_value    4
-            legal_values     2 to 32
-            description      "
-               This option is used to allocate space to buffer incoming network
-               packets.  These buffers are used to hold data until they can be
-               logically processed by higher layers."
         }
     }
 

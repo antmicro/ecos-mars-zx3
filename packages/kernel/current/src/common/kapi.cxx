@@ -1101,13 +1101,6 @@ externC void cyg_mutex_set_protocol(
 }
 #endif
 
-externC void cyg_mutex_set_type(
-    cyg_mutex_t *mutex,
-    cyg_mutex_type_t type ) __THROW
-{
-    ((Cyg_Mutex *)mutex)->set_type((Cyg_Mutex::cyg_type)type);
-}
-
 /*---------------------------------------------------------------------------*/
 /* Condition Variables                                                       */
 

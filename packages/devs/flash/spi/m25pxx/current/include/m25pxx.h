@@ -1,5 +1,6 @@
 #ifndef CYGONCE_DEVS_FLASH_SPI_M25PXX_H
 #define CYGONCE_DEVS_FLASH_SPI_M25PXX_H
+
 //=============================================================================
 //
 //      m25pxx.h
