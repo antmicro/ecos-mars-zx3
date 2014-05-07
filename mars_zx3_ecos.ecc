@@ -82,7 +82,6 @@ cdl_configuration eCos {
     package -template CYGPKG_PPP current ;
     package -template CYGPKG_COMPRESS_ZLIB current ;
     package -template CYGPKG_POWER current ;
-    package -template CYGPKG_VNC_SERVER current ;
     package -template CYGPKG_IO_DISK current ;
     package -template CYGPKG_BLOCK_LIB current ;
     package -template CYGPKG_FS_FAT current ;
@@ -213,9 +212,8 @@ cdl_component CYGBLD_GLOBAL_OPTIONS {
 #
 cdl_option CYGBLD_GLOBAL_COMMAND_PREFIX {
     # Flavor: data
-    # No user value, uncomment the following line to provide one.
-    # user_value arm-none-eabi
-    # value_source default
+    user_value arm-none-eabi
+    # value_source user
     # Default value: arm-none-eabi
 
     # The following properties are affected by this value
@@ -231,13 +229,13 @@ cdl_option CYGBLD_GLOBAL_COMMAND_PREFIX {
 cdl_option CYGBLD_GLOBAL_CFLAGS {
     # Flavor: data
     # No user value, uncomment the following line to provide one.
-    # user_value "-Wall -Wpointer-arith -Wstrict-prototypes -Wundef -Woverloaded-virtual -Wno-write-strings  -mno-thumb-interwork -mcpu=cortex-a9 -mfpu=neon -g -O2 -ffunction-sections -fdata-sections -fno-rtti -fno-exceptions -fvtable-gc -finit-priority"
+    # user_value "-Wall -Wpointer-arith -Wstrict-prototypes -Wundef -Woverloaded-virtual -Wno-write-strings  -mno-thumb-interwork -mcpu=cortex-a9 -mfpu=neon -g -O2 -ffunction-sections -fdata-sections -fno-rtti -fno-exceptions -fvtable-gc -finit-priority -fno-builtin-memcpy"
     # value_source default
     # Default value:  CYGBLD_GLOBAL_WARNFLAGS . CYGBLD_ARCH_CFLAGS .
-    #                                 "-mcpu=cortex-a9 -mfpu=neon -g -O2 -ffunction-sections -fdata-sections -fno-rtti -fno-exceptions -fvtable-gc -finit-priority" 
+    #                                 "-mcpu=cortex-a9 -mfpu=neon -g -O2 -ffunction-sections -fdata-sections -fno-rtti -fno-exceptions -fvtable-gc -finit-priority -fno-builtin-memcpy" 
     #     CYGBLD_GLOBAL_WARNFLAGS == "-Wall -Wpointer-arith -Wstrict-prototypes -Wundef -Woverloaded-virtual -Wno-write-strings "
     #     CYGBLD_ARCH_CFLAGS == " -mno-thumb-interwork "
-    #   --> "-Wall -Wpointer-arith -Wstrict-prototypes -Wundef -Woverloaded-virtual -Wno-write-strings  -mno-thumb-interwork -mcpu=cortex-a9 -mfpu=neon -g -O2 -ffunction-sections -fdata-sections -fno-rtti -fno-exceptions -fvtable-gc -finit-priority"
+    #   --> "-Wall -Wpointer-arith -Wstrict-prototypes -Wundef -Woverloaded-virtual -Wno-write-strings  -mno-thumb-interwork -mcpu=cortex-a9 -mfpu=neon -g -O2 -ffunction-sections -fdata-sections -fno-rtti -fno-exceptions -fvtable-gc -finit-priority -fno-builtin-memcpy"
 
     # The following properties are affected by this value
     # option CYGBLD_ARCH_CFLAGS
@@ -389,50 +387,50 @@ cdl_option CYGBLD_ARCH_CFLAGS {
     #                                                                                       !is_substr(CYGBLD_GLOBAL_CFLAGS, " -mno-thumb-interwork ") 
     #     CYGHWR_THUMB == 0
     #     CYGBLD_ARM_ENABLE_THUMB_INTERWORK == 0
-    #     CYGBLD_GLOBAL_CFLAGS == "-Wall -Wpointer-arith -Wstrict-prototypes -Wundef -Woverloaded-virtual -Wno-write-strings  -mno-thumb-interwork -mcpu=cortex-a9 -mfpu=neon -g -O2 -ffunction-sections -fdata-sections -fno-rtti -fno-exceptions -fvtable-gc -finit-priority"
-    #     CYGBLD_GLOBAL_CFLAGS == "-Wall -Wpointer-arith -Wstrict-prototypes -Wundef -Woverloaded-virtual -Wno-write-strings  -mno-thumb-interwork -mcpu=cortex-a9 -mfpu=neon -g -O2 -ffunction-sections -fdata-sections -fno-rtti -fno-exceptions -fvtable-gc -finit-priority"
-    #     CYGBLD_GLOBAL_CFLAGS == "-Wall -Wpointer-arith -Wstrict-prototypes -Wundef -Woverloaded-virtual -Wno-write-strings  -mno-thumb-interwork -mcpu=cortex-a9 -mfpu=neon -g -O2 -ffunction-sections -fdata-sections -fno-rtti -fno-exceptions -fvtable-gc -finit-priority"
+    #     CYGBLD_GLOBAL_CFLAGS == "-Wall -Wpointer-arith -Wstrict-prototypes -Wundef -Woverloaded-virtual -Wno-write-strings  -mno-thumb-interwork -mcpu=cortex-a9 -mfpu=neon -g -O2 -ffunction-sections -fdata-sections -fno-rtti -fno-exceptions -fvtable-gc -finit-priority -fno-builtin-memcpy"
+    #     CYGBLD_GLOBAL_CFLAGS == "-Wall -Wpointer-arith -Wstrict-prototypes -Wundef -Woverloaded-virtual -Wno-write-strings  -mno-thumb-interwork -mcpu=cortex-a9 -mfpu=neon -g -O2 -ffunction-sections -fdata-sections -fno-rtti -fno-exceptions -fvtable-gc -finit-priority -fno-builtin-memcpy"
+    #     CYGBLD_GLOBAL_CFLAGS == "-Wall -Wpointer-arith -Wstrict-prototypes -Wundef -Woverloaded-virtual -Wno-write-strings  -mno-thumb-interwork -mcpu=cortex-a9 -mfpu=neon -g -O2 -ffunction-sections -fdata-sections -fno-rtti -fno-exceptions -fvtable-gc -finit-priority -fno-builtin-memcpy"
     #   --> 1
     # Requires:  !CYGHWR_THUMB &&  CYGBLD_ARM_ENABLE_THUMB_INTERWORK implies !is_substr(CYGBLD_GLOBAL_CFLAGS, " -mthumb ") &&
     #                                                                                        is_substr(CYGBLD_GLOBAL_CFLAGS, " -mthumb-interwork ") &&
     #                                                                                       !is_substr(CYGBLD_GLOBAL_CFLAGS, " -mno-thumb-interwork ") 
     #     CYGHWR_THUMB == 0
     #     CYGBLD_ARM_ENABLE_THUMB_INTERWORK == 0
-    #     CYGBLD_GLOBAL_CFLAGS == "-Wall -Wpointer-arith -Wstrict-prototypes -Wundef -Woverloaded-virtual -Wno-write-strings  -mno-thumb-interwork -mcpu=cortex-a9 -mfpu=neon -g -O2 -ffunction-sections -fdata-sections -fno-rtti -fno-exceptions -fvtable-gc -finit-priority"
-    #     CYGBLD_GLOBAL_CFLAGS == "-Wall -Wpointer-arith -Wstrict-prototypes -Wundef -Woverloaded-virtual -Wno-write-strings  -mno-thumb-interwork -mcpu=cortex-a9 -mfpu=neon -g -O2 -ffunction-sections -fdata-sections -fno-rtti -fno-exceptions -fvtable-gc -finit-priority"
-    #     CYGBLD_GLOBAL_CFLAGS == "-Wall -Wpointer-arith -Wstrict-prototypes -Wundef -Woverloaded-virtual -Wno-write-strings  -mno-thumb-interwork -mcpu=cortex-a9 -mfpu=neon -g -O2 -ffunction-sections -fdata-sections -fno-rtti -fno-exceptions -fvtable-gc -finit-priority"
+    #     CYGBLD_GLOBAL_CFLAGS == "-Wall -Wpointer-arith -Wstrict-prototypes -Wundef -Woverloaded-virtual -Wno-write-strings  -mno-thumb-interwork -mcpu=cortex-a9 -mfpu=neon -g -O2 -ffunction-sections -fdata-sections -fno-rtti -fno-exceptions -fvtable-gc -finit-priority -fno-builtin-memcpy"
+    #     CYGBLD_GLOBAL_CFLAGS == "-Wall -Wpointer-arith -Wstrict-prototypes -Wundef -Woverloaded-virtual -Wno-write-strings  -mno-thumb-interwork -mcpu=cortex-a9 -mfpu=neon -g -O2 -ffunction-sections -fdata-sections -fno-rtti -fno-exceptions -fvtable-gc -finit-priority -fno-builtin-memcpy"
+    #     CYGBLD_GLOBAL_CFLAGS == "-Wall -Wpointer-arith -Wstrict-prototypes -Wundef -Woverloaded-virtual -Wno-write-strings  -mno-thumb-interwork -mcpu=cortex-a9 -mfpu=neon -g -O2 -ffunction-sections -fdata-sections -fno-rtti -fno-exceptions -fvtable-gc -finit-priority -fno-builtin-memcpy"
     #   --> 1
     # Requires:   CYGHWR_THUMB && !CYGBLD_ARM_ENABLE_THUMB_INTERWORK implies  is_substr(CYGBLD_GLOBAL_CFLAGS, " -mthumb ") &&
     #                                                                                       !is_substr(CYGBLD_GLOBAL_CFLAGS, " -mthumb-interwork ") &&
     #                                                                                        is_substr(CYGBLD_GLOBAL_CFLAGS, " -mno-thumb-interwork ") 
     #     CYGHWR_THUMB == 0
     #     CYGBLD_ARM_ENABLE_THUMB_INTERWORK == 0
-    #     CYGBLD_GLOBAL_CFLAGS == "-Wall -Wpointer-arith -Wstrict-prototypes -Wundef -Woverloaded-virtual -Wno-write-strings  -mno-thumb-interwork -mcpu=cortex-a9 -mfpu=neon -g -O2 -ffunction-sections -fdata-sections -fno-rtti -fno-exceptions -fvtable-gc -finit-priority"
-    #     CYGBLD_GLOBAL_CFLAGS == "-Wall -Wpointer-arith -Wstrict-prototypes -Wundef -Woverloaded-virtual -Wno-write-strings  -mno-thumb-interwork -mcpu=cortex-a9 -mfpu=neon -g -O2 -ffunction-sections -fdata-sections -fno-rtti -fno-exceptions -fvtable-gc -finit-priority"
-    #     CYGBLD_GLOBAL_CFLAGS == "-Wall -Wpointer-arith -Wstrict-prototypes -Wundef -Woverloaded-virtual -Wno-write-strings  -mno-thumb-interwork -mcpu=cortex-a9 -mfpu=neon -g -O2 -ffunction-sections -fdata-sections -fno-rtti -fno-exceptions -fvtable-gc -finit-priority"
+    #     CYGBLD_GLOBAL_CFLAGS == "-Wall -Wpointer-arith -Wstrict-prototypes -Wundef -Woverloaded-virtual -Wno-write-strings  -mno-thumb-interwork -mcpu=cortex-a9 -mfpu=neon -g -O2 -ffunction-sections -fdata-sections -fno-rtti -fno-exceptions -fvtable-gc -finit-priority -fno-builtin-memcpy"
+    #     CYGBLD_GLOBAL_CFLAGS == "-Wall -Wpointer-arith -Wstrict-prototypes -Wundef -Woverloaded-virtual -Wno-write-strings  -mno-thumb-interwork -mcpu=cortex-a9 -mfpu=neon -g -O2 -ffunction-sections -fdata-sections -fno-rtti -fno-exceptions -fvtable-gc -finit-priority -fno-builtin-memcpy"
+    #     CYGBLD_GLOBAL_CFLAGS == "-Wall -Wpointer-arith -Wstrict-prototypes -Wundef -Woverloaded-virtual -Wno-write-strings  -mno-thumb-interwork -mcpu=cortex-a9 -mfpu=neon -g -O2 -ffunction-sections -fdata-sections -fno-rtti -fno-exceptions -fvtable-gc -finit-priority -fno-builtin-memcpy"
     #   --> 1
     # Requires:  !CYGHWR_THUMB && !CYGBLD_ARM_ENABLE_THUMB_INTERWORK implies !is_substr(CYGBLD_GLOBAL_CFLAGS, " -mthumb ") &&
     #                                                                                       !is_substr(CYGBLD_GLOBAL_CFLAGS, " -mthumb-interwork ") &&
     #                                                                                        is_substr(CYGBLD_GLOBAL_CFLAGS, " -mno-thumb-interwork ") 
     #     CYGHWR_THUMB == 0
     #     CYGBLD_ARM_ENABLE_THUMB_INTERWORK == 0
-    #     CYGBLD_GLOBAL_CFLAGS == "-Wall -Wpointer-arith -Wstrict-prototypes -Wundef -Woverloaded-virtual -Wno-write-strings  -mno-thumb-interwork -mcpu=cortex-a9 -mfpu=neon -g -O2 -ffunction-sections -fdata-sections -fno-rtti -fno-exceptions -fvtable-gc -finit-priority"
-    #     CYGBLD_GLOBAL_CFLAGS == "-Wall -Wpointer-arith -Wstrict-prototypes -Wundef -Woverloaded-virtual -Wno-write-strings  -mno-thumb-interwork -mcpu=cortex-a9 -mfpu=neon -g -O2 -ffunction-sections -fdata-sections -fno-rtti -fno-exceptions -fvtable-gc -finit-priority"
-    #     CYGBLD_GLOBAL_CFLAGS == "-Wall -Wpointer-arith -Wstrict-prototypes -Wundef -Woverloaded-virtual -Wno-write-strings  -mno-thumb-interwork -mcpu=cortex-a9 -mfpu=neon -g -O2 -ffunction-sections -fdata-sections -fno-rtti -fno-exceptions -fvtable-gc -finit-priority"
+    #     CYGBLD_GLOBAL_CFLAGS == "-Wall -Wpointer-arith -Wstrict-prototypes -Wundef -Woverloaded-virtual -Wno-write-strings  -mno-thumb-interwork -mcpu=cortex-a9 -mfpu=neon -g -O2 -ffunction-sections -fdata-sections -fno-rtti -fno-exceptions -fvtable-gc -finit-priority -fno-builtin-memcpy"
+    #     CYGBLD_GLOBAL_CFLAGS == "-Wall -Wpointer-arith -Wstrict-prototypes -Wundef -Woverloaded-virtual -Wno-write-strings  -mno-thumb-interwork -mcpu=cortex-a9 -mfpu=neon -g -O2 -ffunction-sections -fdata-sections -fno-rtti -fno-exceptions -fvtable-gc -finit-priority -fno-builtin-memcpy"
+    #     CYGBLD_GLOBAL_CFLAGS == "-Wall -Wpointer-arith -Wstrict-prototypes -Wundef -Woverloaded-virtual -Wno-write-strings  -mno-thumb-interwork -mcpu=cortex-a9 -mfpu=neon -g -O2 -ffunction-sections -fdata-sections -fno-rtti -fno-exceptions -fvtable-gc -finit-priority -fno-builtin-memcpy"
     #   --> 1
     # Requires:   CYGHWR_HAL_ARM_BIGENDIAN          implies  is_substr(CYGBLD_GLOBAL_CFLAGS, " -mbig-endian ") 
     #     CYGHWR_HAL_ARM_BIGENDIAN == 0
-    #     CYGBLD_GLOBAL_CFLAGS == "-Wall -Wpointer-arith -Wstrict-prototypes -Wundef -Woverloaded-virtual -Wno-write-strings  -mno-thumb-interwork -mcpu=cortex-a9 -mfpu=neon -g -O2 -ffunction-sections -fdata-sections -fno-rtti -fno-exceptions -fvtable-gc -finit-priority"
+    #     CYGBLD_GLOBAL_CFLAGS == "-Wall -Wpointer-arith -Wstrict-prototypes -Wundef -Woverloaded-virtual -Wno-write-strings  -mno-thumb-interwork -mcpu=cortex-a9 -mfpu=neon -g -O2 -ffunction-sections -fdata-sections -fno-rtti -fno-exceptions -fvtable-gc -finit-priority -fno-builtin-memcpy"
     #   --> 1
     # Requires:  !CYGHWR_HAL_ARM_BIGENDIAN          implies !is_substr(CYGBLD_GLOBAL_CFLAGS, " -mbig-endian ") 
     #     CYGHWR_HAL_ARM_BIGENDIAN == 0
-    #     CYGBLD_GLOBAL_CFLAGS == "-Wall -Wpointer-arith -Wstrict-prototypes -Wundef -Woverloaded-virtual -Wno-write-strings  -mno-thumb-interwork -mcpu=cortex-a9 -mfpu=neon -g -O2 -ffunction-sections -fdata-sections -fno-rtti -fno-exceptions -fvtable-gc -finit-priority"
+    #     CYGBLD_GLOBAL_CFLAGS == "-Wall -Wpointer-arith -Wstrict-prototypes -Wundef -Woverloaded-virtual -Wno-write-strings  -mno-thumb-interwork -mcpu=cortex-a9 -mfpu=neon -g -O2 -ffunction-sections -fdata-sections -fno-rtti -fno-exceptions -fvtable-gc -finit-priority -fno-builtin-memcpy"
     #   --> 1
 
     # The following properties are affected by this value
     # option CYGBLD_GLOBAL_CFLAGS
     #     DefaultValue:  CYGBLD_GLOBAL_WARNFLAGS . CYGBLD_ARCH_CFLAGS .
-    #                                 "-mcpu=cortex-a9 -mfpu=neon -g -O2 -ffunction-sections -fdata-sections -fno-rtti -fno-exceptions -fvtable-gc -finit-priority" 
+    #                                 "-mcpu=cortex-a9 -mfpu=neon -g -O2 -ffunction-sections -fdata-sections -fno-rtti -fno-exceptions -fvtable-gc -finit-priority -fno-builtin-memcpy" 
 };
 
 # Architecture-specific linker flags
@@ -509,7 +507,7 @@ cdl_option CYGBLD_GLOBAL_WARNFLAGS {
     # The following properties are affected by this value
     # option CYGBLD_GLOBAL_CFLAGS
     #     DefaultValue:  CYGBLD_GLOBAL_WARNFLAGS . CYGBLD_ARCH_CFLAGS .
-    #                                 "-mcpu=cortex-a9 -mfpu=neon -g -O2 -ffunction-sections -fdata-sections -fno-rtti -fno-exceptions -fvtable-gc -finit-priority" 
+    #                                 "-mcpu=cortex-a9 -mfpu=neon -g -O2 -ffunction-sections -fdata-sections -fno-rtti -fno-exceptions -fvtable-gc -finit-priority -fno-builtin-memcpy" 
 };
 
 # Build common GDB stub ROM image
@@ -2487,9 +2485,9 @@ cdl_option CYGBLD_HAL_ARM_EABI {
     # value_source default
     # Default value:  (is_substr(CYGBLD_GLOBAL_COMMAND_PREFIX, "-eabi") &&  !is_substr(CYGBLD_GLOBAL_CFLAGS, "-mabi=apcs-gnu") &&  !is_substr(CYGBLD_GLOBAL_CFLAGS, "-mabi=atpcs")) ||  is_substr(CYGBLD_GLOBAL_CFLAGS, "-mabi=aapcs") 
     #     CYGBLD_GLOBAL_COMMAND_PREFIX == arm-none-eabi
-    #     CYGBLD_GLOBAL_CFLAGS == "-Wall -Wpointer-arith -Wstrict-prototypes -Wundef -Woverloaded-virtual -Wno-write-strings  -mno-thumb-interwork -mcpu=cortex-a9 -mfpu=neon -g -O2 -ffunction-sections -fdata-sections -fno-rtti -fno-exceptions -fvtable-gc -finit-priority"
-    #     CYGBLD_GLOBAL_CFLAGS == "-Wall -Wpointer-arith -Wstrict-prototypes -Wundef -Woverloaded-virtual -Wno-write-strings  -mno-thumb-interwork -mcpu=cortex-a9 -mfpu=neon -g -O2 -ffunction-sections -fdata-sections -fno-rtti -fno-exceptions -fvtable-gc -finit-priority"
-    #     CYGBLD_GLOBAL_CFLAGS == "-Wall -Wpointer-arith -Wstrict-prototypes -Wundef -Woverloaded-virtual -Wno-write-strings  -mno-thumb-interwork -mcpu=cortex-a9 -mfpu=neon -g -O2 -ffunction-sections -fdata-sections -fno-rtti -fno-exceptions -fvtable-gc -finit-priority"
+    #     CYGBLD_GLOBAL_CFLAGS == "-Wall -Wpointer-arith -Wstrict-prototypes -Wundef -Woverloaded-virtual -Wno-write-strings  -mno-thumb-interwork -mcpu=cortex-a9 -mfpu=neon -g -O2 -ffunction-sections -fdata-sections -fno-rtti -fno-exceptions -fvtable-gc -finit-priority -fno-builtin-memcpy"
+    #     CYGBLD_GLOBAL_CFLAGS == "-Wall -Wpointer-arith -Wstrict-prototypes -Wundef -Woverloaded-virtual -Wno-write-strings  -mno-thumb-interwork -mcpu=cortex-a9 -mfpu=neon -g -O2 -ffunction-sections -fdata-sections -fno-rtti -fno-exceptions -fvtable-gc -finit-priority -fno-builtin-memcpy"
+    #     CYGBLD_GLOBAL_CFLAGS == "-Wall -Wpointer-arith -Wstrict-prototypes -Wundef -Woverloaded-virtual -Wno-write-strings  -mno-thumb-interwork -mcpu=cortex-a9 -mfpu=neon -g -O2 -ffunction-sections -fdata-sections -fno-rtti -fno-exceptions -fvtable-gc -finit-priority -fno-builtin-memcpy"
     #   --> 1
 };
 
@@ -2986,8 +2984,6 @@ cdl_package CYGPKG_IO {
     # package CYGPKG_NET_FTPCLIENT
     #     Requires: CYGPKG_IO
     # package CYGPKG_PPP
-    #     Requires: CYGPKG_IO
-    # package CYGPKG_VNC_SERVER
     #     Requires: CYGPKG_IO
     # package CYGPKG_IO_DISK
     #     ActiveIf: CYGPKG_IO
@@ -4827,6 +4823,17 @@ cdl_option CYGHWR_DEVS_ETH_PHY_VSC8244 {
     # Default value: 0
 };
 
+# Marvell 88E1518
+# Include support for PHY Marvell 88E1518
+#
+cdl_option CYGHWR_DEVS_ETH_PHY_MV88E1518 {
+    # Flavor: bool
+    # No user value, uncomment the following line to provide one.
+    # user_value 0
+    # value_source default
+    # Default value: 0
+};
+
 # <
 # <
 # Generic power management support
@@ -5758,7 +5765,7 @@ cdl_option CYGBLD_INFRA_CFLAGS_WARNINGS_AS_ERRORS {
     # value_source default
     # Default value: 0
     # Requires:  is_substr(CYGBLD_GLOBAL_CFLAGS, " -Werror") 
-    #     CYGBLD_GLOBAL_CFLAGS == "-Wall -Wpointer-arith -Wstrict-prototypes -Wundef -Woverloaded-virtual -Wno-write-strings  -mno-thumb-interwork -mcpu=cortex-a9 -mfpu=neon -g -O2 -ffunction-sections -fdata-sections -fno-rtti -fno-exceptions -fvtable-gc -finit-priority"
+    #     CYGBLD_GLOBAL_CFLAGS == "-Wall -Wpointer-arith -Wstrict-prototypes -Wundef -Woverloaded-virtual -Wno-write-strings  -mno-thumb-interwork -mcpu=cortex-a9 -mfpu=neon -g -O2 -ffunction-sections -fdata-sections -fno-rtti -fno-exceptions -fvtable-gc -finit-priority -fno-builtin-memcpy"
     #   --> 0
 };
 
@@ -5775,7 +5782,7 @@ cdl_option CYGBLD_INFRA_CFLAGS_PIPE {
     # value_source default
     # Default value: 0
     # Requires:  is_substr(CYGBLD_GLOBAL_CFLAGS, " -pipe") 
-    #     CYGBLD_GLOBAL_CFLAGS == "-Wall -Wpointer-arith -Wstrict-prototypes -Wundef -Woverloaded-virtual -Wno-write-strings  -mno-thumb-interwork -mcpu=cortex-a9 -mfpu=neon -g -O2 -ffunction-sections -fdata-sections -fno-rtti -fno-exceptions -fvtable-gc -finit-priority"
+    #     CYGBLD_GLOBAL_CFLAGS == "-Wall -Wpointer-arith -Wstrict-prototypes -Wundef -Woverloaded-virtual -Wno-write-strings  -mno-thumb-interwork -mcpu=cortex-a9 -mfpu=neon -g -O2 -ffunction-sections -fdata-sections -fno-rtti -fno-exceptions -fvtable-gc -finit-priority -fno-builtin-memcpy"
     #   --> 0
 };
 
@@ -6348,10 +6355,6 @@ cdl_component CYGNUM_KERNEL_SCHED_PRIORITIES {
     #     LegalValues: 0 to CYGNUM_KERNEL_SCHED_PRIORITIES
     # option CYGNUM_POWER_THREAD_PRIORITY
     #     ActiveIf:  CYGNUM_KERNEL_SCHED_PRIORITIES > 2 
-    # option CYGNUM_VNC_SERVER_PRIORITY
-    #     DefaultValue:  CYGNUM_KERNEL_SCHED_PRIORITIES-2 
-    # option CYGNUM_VNC_SERVER_PRIORITY
-    #     LegalValues: 0 to CYGNUM_KERNEL_SCHED_PRIORITIES
 };
 
 # >
@@ -16768,10 +16771,6 @@ cdl_package CYGPKG_IO_FILEIO {
     #     Requires: CYGPKG_IO_FILEIO
     # package CYGPKG_FS_JFFS2
     #     Requires: CYGPKG_IO_FILEIO
-    # component CYGPKG_VNC_SERVER_BUILD_MOUSE_DRIVER
-    #     Requires: CYGPKG_IO_FILEIO
-    # component CYGPKG_VNC_SERVER_BUILD_KEYBOARD_DRIVER
-    #     Requires: CYGPKG_IO_FILEIO
     # package CYGPKG_FS_FAT
     #     Requires: CYGPKG_IO_FILEIO
 };
@@ -18138,8 +18137,6 @@ cdl_package CYGPKG_NET {
     #     Requires: CYGPKG_NET
     # package CYGPKG_PPP
     #     Requires: CYGPKG_NET
-    # package CYGPKG_VNC_SERVER
-    #     Requires: (CYGPKG_NET || CYGPKG_NET_LWIP)
 };
 
 # >
@@ -22498,357 +22495,6 @@ cdl_option CYGPKG_COMPRESS_ZLIB_TESTS {
     # Calculated value:  "tests/zlib1 tests/zlib2" 
     # Flavor: data
     # Current_value: tests/zlib1 tests/zlib2
-};
-
-# <
-# VNC Server
-# doc: doc/vnc-server.html
-# VNC Server.
-#
-cdl_package CYGPKG_VNC_SERVER {
-    # Packages cannot be added or removed, nor can their version be changed,
-    # simply by editing their value. Instead the appropriate configuration
-    # should be used to perform these actions.
-
-    # This value cannot be modified here.
-    # Flavor: booldata
-    # Current value: 1 current
-    # Requires: (CYGNUM_VNC_SERVER_PIXEL_SELECTED <= 1)
-    #     CYGNUM_VNC_SERVER_PIXEL_SELECTED == 1
-    #   --> 1
-    # Requires: CYGPKG_IO
-    #     CYGPKG_IO == current
-    #   --> 1
-    # Requires: (CYGPKG_NET || CYGPKG_NET_LWIP)
-    #     CYGPKG_NET == current
-    #     CYGPKG_NET_LWIP (unknown) == 0
-    #   --> 1
-};
-
-# >
-# VNC server port number
-# Port VNC server will listen on for client connection.
-# This defaults to the standard port 5900, but may
-# be changed to any other port number if required.
-#
-cdl_option CYGNUM_VNC_SERVER_PORT {
-    # Flavor: data
-    # No user value, uncomment the following line to provide one.
-    # user_value 5900
-    # value_source default
-    # Default value: 5900
-};
-
-# VNC Desktop Name
-# This is the string that will be sent to the client
-# in the ServerInitialisation message as the desktop
-# name.
-#
-cdl_option CYGDAT_VNC_DESKTOP_NAME {
-    # Flavor: data
-    # No user value, uncomment the following line to provide one.
-    # user_value "\"eCos Desktop\""
-    # value_source default
-    # Default value: "\"eCos Desktop\""
-};
-
-# VNC server startup delay
-# This defines the number of system clock ticks that the VNC
-# server will wait before initializing itself and spawning any
-# extra server threads. This is to give the application a chance
-# to initialize properly without any interference from the VNC
-# server.
-#
-cdl_option CYGNUM_VNC_SERVER_DELAY {
-    # Flavor: data
-    # No user value, uncomment the following line to provide one.
-    # user_value 0
-    # value_source default
-    # Default value: 0
-};
-
-# VNC server thread priority
-# This sets the priority of the VNC server threads.
-# The default priority is 1 above the lowest priority.
-#
-cdl_option CYGNUM_VNC_SERVER_PRIORITY {
-    # Flavor: data
-    # No user value, uncomment the following line to provide one.
-    # user_value 30
-    # value_source default
-    # Default value:  CYGNUM_KERNEL_SCHED_PRIORITIES-2 
-    #     CYGNUM_KERNEL_SCHED_PRIORITIES == 32
-    #   --> 30
-    # Legal values: 0 to CYGNUM_KERNEL_SCHED_PRIORITIES
-    #     CYGNUM_KERNEL_SCHED_PRIORITIES == 32
-};
-
-# Encoding options
-#
-cdl_component CYGPKG_VNC_SERVER_ENCODING_OPTIONS {
-    # There is no associated value.
-};
-
-# >
-# Use CoRRE encoding
-# This option causes the VNC server to use
-# CoRRE encoding on the display data it sends to the client
-# (vncviewer program). If an encoded data packet works out
-# larger than the RAW data packet, then that packet is sent
-# as raw data anyway.  If this option is not selected, or
-# the client does not support CoRRE encoding, then the display
-# data is sent as raw data.
-#
-cdl_component CYGNUM_VNC_SERVER_USE_CORRE_ENCODING {
-    # Flavor: bool
-    # No user value, uncomment the following line to provide one.
-    # user_value 1
-    # value_source default
-    # Default value: 1
-};
-
-# >
-# Work-around CoRRE bug in vncviewer
-# Some versions of the vncviewer program have
-# a bug where they don't display the background colour when
-# CoRRE encoding is used.  This option adds a workaround to
-# this bug to the VNC server.  Note, this problem is not seen
-# with the TightVNC viewer.
-#
-cdl_option CYGNUM_VNC_SERVER_CORRE_ENCODING_HACK {
-    # Flavor: bool
-    # No user value, uncomment the following line to provide one.
-    # user_value 1
-    # value_source default
-    # Default value: 1
-};
-
-# <
-# <
-# Display options
-#
-cdl_component CYGPKG_VNC_SERVER_DISPLAY_OPTIONS {
-    # There is no associated value.
-};
-
-# >
-# Frame width in pixels
-# This sets the width of the VNC server frame buffer.
-#
-cdl_option CYGNUM_VNC_SERVER_FRAME_WIDTH {
-    # Flavor: data
-    # No user value, uncomment the following line to provide one.
-    # user_value 640
-    # value_source default
-    # Default value: 640
-};
-
-# Frame heigth in pixels
-# This sets the height of the VNC server frame buffer.
-#
-cdl_option CYGNUM_VNC_SERVER_FRAME_HEIGHT {
-    # Flavor: data
-    # No user value, uncomment the following line to provide one.
-    # user_value 480
-    # value_source default
-    # Default value: 480
-};
-
-# Display tile size
-# This sets the size of the tile for the VNC server.  The VNC
-# frame is split into tiles and frame updates to the client are always
-# multiples of whole tiles.  Note that these tiles are not the same as the
-# tiles used with Hextile encoding.
-#
-cdl_option CYGNUM_VNC_SERVER_TILE_SIZE {
-    # Flavor: data
-    # No user value, uncomment the following line to provide one.
-    # user_value 32
-    # value_source default
-    # Default value: 32
-    # Legal values: 1 to 255
-};
-
-# Pixel format support
-#
-cdl_interface CYGNUM_VNC_SERVER_PIXEL_SELECTED {
-    # Implemented by CYGNUM_VNC_SERVER_PIXEL_RGB332, active, disabled
-    # Implemented by CYGNUM_VNC_SERVER_PIXEL_BGR233, active, enabled
-    # Implemented by CYGNUM_VNC_SERVER_PIXEL_RGB555, active, disabled
-    # Implemented by CYGNUM_VNC_SERVER_PIXEL_RGB565, active, disabled
-    # Implemented by CYGNUM_VNC_SERVER_PIXEL_TRUECOLOR0888, active, disabled
-    # This value cannot be modified here.
-    # Flavor: data
-    # Current_value: 1
-
-    # The following properties are affected by this value
-    # package CYGPKG_VNC_SERVER
-    #     Requires: (CYGNUM_VNC_SERVER_PIXEL_SELECTED <= 1)
-};
-
-# RGB332 pixel format (8-bit)
-# This selects 8-bit, RGB332 pixel format.
-#
-cdl_option CYGNUM_VNC_SERVER_PIXEL_RGB332 {
-    # Flavor: bool
-    # No user value, uncomment the following line to provide one.
-    # user_value 0
-    # value_source default
-    # Default value: 0
-};
-
-# BGR233 pixel format (8-bit)
-# This selects 8-bit, BGR233 pixel format.
-#
-cdl_option CYGNUM_VNC_SERVER_PIXEL_BGR233 {
-    # Flavor: bool
-    # No user value, uncomment the following line to provide one.
-    # user_value 1
-    # value_source default
-    # Default value: 1
-};
-
-# RGB555 pixel format (16-bit)
-# This selects 16-bit, RGB555 pixel format.
-#
-cdl_option CYGNUM_VNC_SERVER_PIXEL_RGB555 {
-    # Flavor: bool
-    # No user value, uncomment the following line to provide one.
-    # user_value 0
-    # value_source default
-    # Default value: 0
-};
-
-# RGB565 pixel format (16-bit)
-# This selects 16-bit, RGB565 pixel format.
-#
-cdl_option CYGNUM_VNC_SERVER_PIXEL_RGB565 {
-    # Flavor: bool
-    # No user value, uncomment the following line to provide one.
-    # user_value 0
-    # value_source default
-    # Default value: 0
-};
-
-# True Color pixel format (32-bit)
-# This selects 32-bit, TRUECOLOR0888 pixel format.
-#
-cdl_option CYGNUM_VNC_SERVER_PIXEL_TRUECOLOR0888 {
-    # Flavor: bool
-    # No user value, uncomment the following line to provide one.
-    # user_value 0
-    # value_source default
-    # Default value: 0
-};
-
-# Include VncPrintf() function
-# If this option is selected, the VNC server will include
-# the VncPrintf function for writing text to the VNC server frame buffer.
-# This function is not available if the MicroWindows package is also
-# included.
-#
-cdl_option CYGNUM_VNC_SERVER_INCLUDE_VNC_PRINTF {
-    # Flavor: bool
-    # No user value, uncomment the following line to provide one.
-    # user_value 1
-    # value_source default
-    # Default value: 1
-    # Requires: !CYGPKG_MICROWINDOWS
-    #     CYGPKG_MICROWINDOWS (unknown) == 0
-    #   --> 1
-};
-
-# <
-# Build VNC mouse driver
-# If this option is selected, the VNC mouse driver will be built.
-# If not selected, all mouse data from the VNC client will be
-# quietly ignored.
-#
-cdl_component CYGPKG_VNC_SERVER_BUILD_MOUSE_DRIVER {
-    # Flavor: bool
-    # No user value, uncomment the following line to provide one.
-    # user_value 1
-    # value_source default
-    # Default value: 1
-    # Requires: CYGPKG_IO_FILEIO
-    #     CYGPKG_IO_FILEIO == current
-    #   --> 1
-};
-
-# >
-# Number of mouse events for VNC server mouse driver to buffer.
-# This option specifies how many mouse events the
-# mouse driver can hold before it overflows.
-#
-cdl_option CYGNUM_VNC_SERVER_MOUSE_EVENTS {
-    # Flavor: data
-    # No user value, uncomment the following line to provide one.
-    # user_value 64
-    # value_source default
-    # Default value: 64
-};
-
-# Device name for the VNC server mouse driver
-# This option sets the device name for the VNC server mouse.
-#
-cdl_option CYGDAT_VNC_SERVER_MOUSE_NAME {
-    # Flavor: data
-    # No user value, uncomment the following line to provide one.
-    # user_value "\"/dev/vnc_mouse\""
-    # value_source default
-    # Default value: "\"/dev/vnc_mouse\""
-};
-
-# <
-# Build VNC keyboard driver
-# If this option is selected, the VNC keyboard driver will be
-# built. If not selected, all keyboard data from the VNC client
-# will be quietly ignored.
-#
-cdl_component CYGPKG_VNC_SERVER_BUILD_KEYBOARD_DRIVER {
-    # Flavor: bool
-    # No user value, uncomment the following line to provide one.
-    # user_value 1
-    # value_source default
-    # Default value: 1
-    # Requires: CYGPKG_IO_FILEIO
-    #     CYGPKG_IO_FILEIO == current
-    #   --> 1
-};
-
-# >
-# Number of keyboard events for VNC server keyboard driver to buffer.
-# This option specifies how many keystroke events the 
-# keyboard driver can hold before it overflows.
-#
-cdl_option CYGNUM_VNC_SERVER_KEYBOARD_EVENTS {
-    # Flavor: data
-    # No user value, uncomment the following line to provide one.
-    # user_value 64
-    # value_source default
-    # Default value: 64
-};
-
-# Device name for the VNC server keyboard driver
-# This option sets the device name for the VNC server keyboard.
-#
-cdl_option CYGDAT_VNC_SERVER_KEYBOARD_NAME {
-    # Flavor: data
-    # No user value, uncomment the following line to provide one.
-    # user_value "\"/dev/vnc_kbd\""
-    # value_source default
-    # Default value: "\"/dev/vnc_kbd\""
-};
-
-# <
-# VNC server tests
-# This option specifies the set of tests
-# for the VNC server package.
-#
-cdl_option CYGPKG_VNC_SERVER_TESTS {
-    # Calculated value:  "tests/vnc-test" 
-    # Flavor: data
-    # Current_value: tests/vnc-test
 };
 
 # <
