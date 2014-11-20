@@ -306,3 +306,4 @@ static bool ksz90x1_stat (eth_phy_access_t * f, int *state)
 
 _eth_phy_dev ("Micrel KSZ9021", 0x00221611, ksz90x1_stat)
 _eth_phy_dev ("Micrel KSZ9031", 0x00221621, ksz90x1_stat)
+_eth_phy_dev ("Micrel KSZ9031", 0x00221622, ksz90x1_stat)
