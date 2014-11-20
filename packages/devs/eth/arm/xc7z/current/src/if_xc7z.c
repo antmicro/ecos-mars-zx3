@@ -172,7 +172,7 @@ static int zynq_eth_mdio_read(cyg_uint32 base_addr, int mii_id, int phyreg);
 volatile zynq_eth_bd *last_added_bd = NULL;
 volatile zynq_eth_bd *last_tx_bd = NULL;
 
-#ifdef CYGPKG_DEVS_ETH_ARM_XC7Z_ETH0 || CYGPKG_DEVS_ETH_ARM_XC7Z_ETH1
+#if defined(CYGPKG_DEVS_ETH_ARM_XC7Z_ETH0) || defined(CYGPKG_DEVS_ETH_ARM_XC7Z_ETH1)
 #ifdef CYGPKG_DEVS_ETH_PHY                                      
 #if CYGHWR_DEVS_ETH_PHY_KSZ90x1
 extern int ksz90x1_phy_cfg(eth_phy_access_t *f, int mode);            
@@ -181,7 +181,7 @@ extern int ksz90x1_phy_cfg(eth_phy_access_t *f, int mode);
 #define eth_phy_cfg(f, mode) _eth_phy_state(f)
 #endif //CYGHWR_DEVS_ETH_PHY_KSZ90x1
 #endif //CYGPKG_DEVS_ETH_PHY
-//#endif //CYGPKG_DEVS_ETH_ARM_XC7Z_ETH0 || CYGPKG_DEVS_ETH_ARM_XC7Z_ETH1
+#endif //CYGPKG_DEVS_ETH_ARM_XC7Z_ETH0 || CYGPKG_DEVS_ETH_ARM_XC7Z_ETH1
 /******************************************************************************
  *
  * Ethernet 0
@@ -225,6 +225,7 @@ static void zynq_init_phy0(void)
 static void zynq_reset_phy0(void) 
 { }
 
+#ifdef CYGPKG_DEVS_ETH_PHY
 ETH_PHY_REG_LEVEL_ACCESS_FUNS(zynq_phy0,
                               zynq_init_phy0,
                               zynq_reset_phy0,
@@ -314,11 +315,13 @@ static void zynq_init_phy1(void)
 static void zynq_reset_phy1(void) 
 { }
 
+#ifdef CYGPKG_DEVS_ETH_PHY
 ETH_PHY_REG_LEVEL_ACCESS_FUNS(zynq_phy1,
                               zynq_init_phy1,
                               zynq_reset_phy1,
                               zynq_write_phy1,
                               zynq_read_phy1);
+#endif
 zynq_eth_t eth1_data = {
 #ifdef CYGPKG_DEVS_ETH_PHY
     .phy = &zynq_phy1,
