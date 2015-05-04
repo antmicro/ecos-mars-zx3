@@ -4,7 +4,7 @@
 //
 //      plf_io.h
 //
-//      Mars ZX3 board specific registers
+//      Mercury ZX1 board specific registers
 //
 //=============================================================================
 // ####ECOSGPLCOPYRIGHTBEGIN####                                            
@@ -41,9 +41,9 @@
 //=============================================================================
 //#####DESCRIPTIONBEGIN####
 //
-// Author(s):    Ant Micro <www.antmicro.com>
-// Date:         2012-07-31
-// Purpose:      Mars ZX3 board specific registers
+// Author(s):    Antmicro Ltd <www.antmicro.com>
+// Date:         2015-04-28
+// Purpose:      Mercury ZX1 board specific registers
 // Description:
 // Usage:        #include <cyg/hal/plf_io.h>
 //
@@ -61,6 +61,7 @@
     extern cyg_i2c_device i2c_rtc_user_sram;	\
     extern cyg_i2c_device i2c_rtc_registers; \
     extern cyg_i2c_bus hal_zynq_i2c_bus;
+
 //----------------------------------------------------------------------
 // The platform needs this initialization during the
 // hal_hardware_init() function in the varient HAL.

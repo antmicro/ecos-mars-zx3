@@ -1,3 +1,5 @@
 build/
 eCos.hhc
 eCos.hhp
+*.swp
+*~
