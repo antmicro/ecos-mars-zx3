@@ -40,10 +40,12 @@ Supported features
 This eCos port provides the following software packages specific for Enclustra's Mars ZX3 Zynq module:
 
 * HAL package
+* SMP (symmetric multiprocessing) support
 * cache support
 * debug UART driver
-* serial port driver
+* serial port (UART) driver
 * Ethernet driver
 * I2C driver
+* SPI driver
 * QSPI Flash driver
 * RedBoot with Ethernet and Flash support
