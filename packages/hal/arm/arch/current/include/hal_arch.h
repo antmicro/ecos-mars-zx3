@@ -43,7 +43,7 @@
 //#####DESCRIPTIONBEGIN####
 //
 // Author(s):    nickg, gthomas
-// Contributors: nickg, gthomas
+// Contributors: nickg, gthomas, Deimos Space <www.deimos-space.com>
 // Date:         1999-02-20
 // Purpose:      Define architecture abstractions
 // Usage:        #include <cyg/hal/hal_arch.h>
@@ -131,13 +131,23 @@
 #define HAL_THREAD_CONTEXT_R10          (10-HAL_THREAD_CONTEXT_FIRST)
 #define HAL_THREAD_CONTEXT_LAST         10
 #define HAL_NUM_THREAD_CONTEXT_REGS     (HAL_THREAD_CONTEXT_LAST - \
-                                          HAL_THREAD_CONTEXT_FIRST+1)
+                                         HAL_THREAD_CONTEXT_FIRST+1)
+// PEPP TBM: include definition: it is only the general registers, currently 11
+#define HAL_NUM_THREAD_CONTEXT_FPU_D_REGS 32
+#define HAL_NUM_THREAD_CONTEXT_FPU_S_REGS 16
 
 // It seems that r0-r3,r12 are considered scratch by function calls
 
 typedef struct 
 {
     // These are common to all saved states
+    // DMS: include in context the FPU registers: fields fpu_d, fpu_s,
+    // fpexc, fpscr
+    cyg_uint64  fpu_d[HAL_NUM_THREAD_CONTEXT_FPU_D_REGS];
+    cyg_uint32  fpu_s[HAL_NUM_THREAD_CONTEXT_FPU_S_REGS];
+    cyg_uint32  fpexc;
+    cyg_uint32  fpscr;
+
     cyg_uint32  d[HAL_NUM_THREAD_CONTEXT_REGS] ;  // Data regs (r0..r10)
     cyg_uint32  fp;                               // (r11) Frame pointer
     cyg_uint32  ip;                               // (r12)
@@ -194,6 +204,7 @@ externC int hal_msbindex(int);
     (_regs_)->lr = (CYG_WORD)(_entry_);     /* LR = entry point       */    \
     (_regs_)->pc = (CYG_WORD)(_entry_);     /* PC = [initial] entry point */\
     (_regs_)->cpsr = (CPSR_THREAD_INITIAL); /* PSR = Interrupt enabled */   \
+    (_regs_)->fpscr = 0x00000000;           /* FPSCR = FPU Status Reg */    \
     _sparg_ = (CYG_ADDRESS)_regs_;                                          \
     CYG_MACRO_END
 
