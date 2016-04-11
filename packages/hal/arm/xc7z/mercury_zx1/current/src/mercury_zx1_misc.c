@@ -40,6 +40,7 @@
 //#####DESCRIPTIONBEGIN####
 //
 // Author(s):    Antmicro Ltd <www.antmicro.com>
+// Contributors: Deimos Space <www.deimos-space.com>
 // Date:         2015-04-28
 // Description:  Based on hwz7zc702 platform HAL
 //
@@ -51,6 +52,7 @@
 #include <pkgconf/hal.h>
 #include <string.h>
 
+#include <sys/reent.h>
 #include <cyg/hal/hal_io.h>
 #include <cyg/hal/hal_diag.h>
 
@@ -96,6 +98,33 @@ void hal_plf_hardware_init(void) {
   HAL_WRITE_UINT32(XC7Z_SCU_WDT_BASEADDR + XSCUWDTIMER_DISABLE_OFFSET, XSCUWDTIMER_WD_DISABLE_SEQ1); 
   HAL_WRITE_UINT32(XC7Z_SCU_WDT_BASEADDR + XSCUWDTIMER_DISABLE_OFFSET, XSCUWDTIMER_WD_DISABLE_SEQ2); 
 #endif
+
+    // Enable FPU
+
+    // ARM Cortex-A9 NEON Media Processing Engine
+    // Revision: r3p0
+    // Technical Reference Manual
+    //
+    // Code:
+    //
+    // MRC p15,0,r0,c1,c0,2   ; Read CPACR into r0
+    // ORR r0,r0,#(3<<20)     ; OR in User and Privileged access for CP10
+    // ORR r0,r0,#(3<<22)     ; OR in User and Privileged access for CP11
+    // BIC r0, r0, #(3<<30)   ; Clear ASEDIS/D32DIS if set
+    // MCR p15,0,r0,c1,c0,2   ; Store new access permissions into CPACR
+    // ISB                    ; Ensure side-effect of CPACR is visible
+    // MOV r0,#(1<<30)        ; Create value with FPEXC (bit 30) set in r0
+    // VMSR FPEXC,r0          ; Enable VFP and SIMD extensions
+
+    asm volatile ("MRC p15,0,r0,c1,c0,2");
+    asm volatile ("ORR r0,r0,#(3<<20)");
+    asm volatile ("ORR r0,r0,#(3<<22)");
+    asm volatile ("BIC r0, r0, #(3<<30)");
+    asm volatile ("MCR p15,0,r0,c1,c0,2");
+    asm volatile ("ISB");
+    asm volatile ("MOV r0,#(1<<30)");
+    asm volatile ("VMSR FPEXC,r0");
+
 }
 
 // -------------------------------------------------------------------------
@@ -129,6 +158,9 @@ void hal_mmu_init(void) {
     ARC_X_ARM_MMU_SECTION(0xF80, 0xF80,   16, ARC_ARM_UNCACHEABLE, ARC_ARM_UNBUFFERABLE, ARC_ARM_ACCESS_PERM_RW_RW); //System registers
     ARC_X_ARM_MMU_SECTION(0xFFF, 0xFFF,    1, ARC_ARM_UNCACHEABLE, ARC_ARM_UNBUFFERABLE, ARC_ARM_ACCESS_PERM_RW_RW); //OCM
 
+    ARC_X_ARM_MMU_SECTION(0x500, 0x500,    3, ARC_ARM_UNCACHEABLE, ARC_ARM_UNBUFFERABLE, ARC_ARM_ACCESS_PERM_RW_RW); //DSP: Channels: (50000000 - 50371FFF)
+    ARC_X_ARM_MMU_SECTION(0x400, 0x400,    1, ARC_ARM_UNCACHEABLE, ARC_ARM_UNBUFFERABLE, ARC_ARM_ACCESS_PERM_RW_RW); //DSP: SLD, TBG, IM (4000000 - 40071FFF)
+
 }
 
 // -------------------------------------------------------------------------
@@ -159,8 +191,15 @@ dl_iterate_phdr(void* arg1, void* arg2)
     return -1;
 }
 
-//XXX: workaround for the non eCos compiler
-void* __attribute__ ((weak)) _impure_ptr;
+struct _reent impure_data = { 0, 0, "", 0, "C"}; // stub for gcc 4.6.1
+
+struct _reent* _impure_ptr = &impure_data;
+
+int* __errno ()
+{
+    return &_impure_ptr->_errno;
+}
+
 #endif
 
 #ifndef CYGPKG_LIBC_STDIO
