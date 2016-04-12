@@ -48,7 +48,7 @@
 //#####DESCRIPTIONBEGIN####
 //
 // Author(s):    ITR-GmbH 
-// Contributors: Antmicro Ltd <www.antmicro.com>, Deimos Space <www.deimos-space.com>
+// Contributors: Antmicro Ltd
 // Date:         2012-06-25
 // Purpose:      HAL board support
 // Description:  Implementations of HAL board interfaces
@@ -387,13 +387,8 @@ void hal_interrupt_configure(int vector, int level, int up)
     // Shift and Mask the correct bits for the priority and trigger in the
     // register
     //
-    //dwRegValue &= ~(XSCUGIC_INT_CFG_MASK << (( vector % 16 ) * 2));
-    //dwRegValue |= up << (( vector % 16 ) * 2);
-
-    // DMS: Config the most significan bit of each pair (i.e: config_63: set bit 31,
-    // config_62: set bit 29 )
-    dwRegValue &= ~(0x00000001 << ((( vector % 16 ) * 2) + 1));
-    dwRegValue |= up << ((( vector % 16 ) * 2) + 1);
+    dwRegValue &= ~(XSCUGIC_INT_CFG_MASK << (( vector % 16 ) * 2));
+    dwRegValue |= up << (( vector % 16 ) * 2);
 
     //
     // Write the value back to the register.
