@@ -41,7 +41,7 @@ This eCos port provides the following software packages specific for Enclustra's
 
 * HAL package
 * SMP (symmetric multiprocessing) support
-* cache support
+* L1 cache (DCACHE & ICACHE) support
 * debug UART driver
 * serial port (UART) driver
 * Ethernet driver
